@@ -1,0 +1,17 @@
+import * as XLSX from 'xlsx';
+
+/**
+ * Utility to export JavaScript array of objects to Excel file (.xlsx)
+ */
+export function exportToExcel(data: Record<string, any>[], fileName: string, sheetName = 'Sheet1') {
+  if (!data || data.length === 0) {
+    alert('No data available to export.');
+    return;
+  }
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+  XLSX.writeFile(workbook, `${fileName}.xlsx`);
+}

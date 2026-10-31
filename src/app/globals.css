@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 20 20% 98%;
+    --foreground: 0 0% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 12%;
+    --primary: 350 85% 35%;
+    --primary-foreground: 45 100% 96%;
+    --gold: 43 96% 56%;
+  }
+
+  body {
+    @apply bg-[#0d0303] text-stone-100 antialiased selection:bg-amber-500 selection:text-maroon-950;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Traditional Rangoli / Festive Pattern Background */
+.festive-pattern {
+  background-color: #120303;
+  background-image: radial-gradient(#d97706 0.75px, transparent 0.75px), radial-gradient(#991b1b 0.75px, #120303 0.75px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+}
+
+.festive-gold-gradient {
+  background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 50%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.festive-card {
+  @apply bg-maroon-950/70 border border-amber-600/30 backdrop-blur-md rounded-2xl shadow-xl transition-all duration-300 hover:border-amber-500/60 hover:shadow-glow-gold;
+}
+
+.festive-btn-gold {
+  @apply bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-maroon-950 font-bold px-6 py-2.5 rounded-full shadow-lg hover:shadow-glow-gold transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0;
+}
+
+.festive-btn-red {
+  @apply bg-gradient-to-r from-red-700 via-red-600 to-maroon-800 text-amber-100 font-bold px-6 py-2.5 rounded-full border border-amber-500/40 shadow-lg hover:shadow-glow-red transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0;
+}
+
+/* Diya Flicker Animation */
+@keyframes flame {
+  0%, 100% {
+    transform: scale(1) rotate(-1deg);
+    opacity: 0.95;
+    filter: drop-shadow(0 0 12px #f59e0b);
+  }
+  50% {
+    transform: scale(1.08) rotate(1.5deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 20px #ef4444);
+  }
+}
+
+.diya-flame {
+  animation: flame 2.5s infinite ease-in-out alternate;
+}
+
+/* Print Styles for Receipts and Reports */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .printable-area {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+}
