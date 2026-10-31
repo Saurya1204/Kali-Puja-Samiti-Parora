@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSessionUser, createAuditLog } from '@/lib/auth';
+import { getSessionUser, createAuditLog, ROLES } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
     const user = await getSessionUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const allowed = [ROLES.SUPER_ADMIN, ROLES.PRESIDENT, ROLES.SECRETARY, ROLES.KABADDI_ADMIN, ROLES.EVENT_MANAGER];
+    if (!allowed.includes(user.role as any)) {
+      return NextResponse.json({ error: 'आपको कबड्डी स्कोर अपडेट करने की अनुमति नहीं है' }, { status: 403 });
+    }
 
     const { matchId, teamAScore, teamBScore, status, commentary, winnerId } = await req.json();
 
@@ -21,7 +26,7 @@ export async function POST(req: NextRequest) {
       include: { teamA: true, teamB: true },
     });
 
-    // If match is marked COMPLETED, recalculate points table for Team A and Team B
+    // If match is marked COMPLETED, update points table for Team A and Team B
     if (status === 'COMPLETED') {
       const isTeamAWinner = match.teamAScore > match.teamBScore;
       const isTeamBWinner = match.teamBScore > match.teamAScore;
@@ -36,6 +41,7 @@ export async function POST(req: NextRequest) {
           matchesLost: isTeamBWinner ? { increment: 1 } : undefined,
           matchesTied: isTie ? { increment: 1 } : undefined,
           points: isTeamAWinner ? { increment: 2 } : isTie ? { increment: 1 } : undefined,
+          scoreDiff: { increment: match.teamAScore - match.teamBScore },
         },
       });
 
@@ -48,6 +54,7 @@ export async function POST(req: NextRequest) {
           matchesLost: isTeamAWinner ? { increment: 1 } : undefined,
           matchesTied: isTie ? { increment: 1 } : undefined,
           points: isTeamBWinner ? { increment: 2 } : isTie ? { increment: 1 } : undefined,
+          scoreDiff: { increment: match.teamBScore - match.teamAScore },
         },
       });
     }

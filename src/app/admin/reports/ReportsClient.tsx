@@ -363,3 +363,4 @@ export default function ReportsClient({ data }: { data: ReportData }) {
     </div>
   );
 }
+

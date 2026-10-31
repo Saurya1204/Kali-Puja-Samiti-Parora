@@ -23,14 +23,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="hi" className="dark">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Rozha+One&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body className="min-h-screen bg-[#0d0303] text-stone-100 font-sans antialiased festive-pattern">
         <LanguageProvider>
           {children}

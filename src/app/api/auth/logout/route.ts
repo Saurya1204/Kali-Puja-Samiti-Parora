@@ -5,3 +5,4 @@ export async function POST(req: NextRequest) {
   cookies().delete('kps_session');
   return NextResponse.json({ success: true, message: 'Logged out successfully' });
 }
+

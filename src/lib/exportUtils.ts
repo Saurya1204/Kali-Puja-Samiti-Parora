@@ -15,3 +15,4 @@ export function exportToExcel(data: Record<string, any>[], fileName: string, she
 
   XLSX.writeFile(workbook, `${fileName}.xlsx`);
 }
+

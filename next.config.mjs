@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  transpilePackages: ['lucide-react'],
+  reactStrictMode: false,
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' },

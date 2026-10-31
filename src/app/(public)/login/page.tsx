@@ -13,12 +13,15 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const demoAccounts = [
-    { role: 'Super Admin', email: 'admin@kalipujaparora.org', pass: 'admin123', color: 'from-amber-500 to-amber-600' },
-    { role: 'Treasurer (कोषाध्यक्ष)', email: 'treasurer@kalipujaparora.org', pass: 'treasurer123', color: 'from-emerald-500 to-emerald-600' },
-    { role: 'Secretary (सचिव)', email: 'secretary@kalipujaparora.org', pass: 'secretary123', color: 'from-blue-500 to-blue-600' },
-    { role: 'President (अध्यक्ष)', email: 'president@kalipujaparora.org', pass: 'president123', color: 'from-purple-500 to-purple-600' },
-    { role: 'Event Manager', email: 'events@kalipujaparora.org', pass: 'events123', color: 'from-rose-500 to-rose-600' },
-    { role: 'Volunteer', email: 'volunteer@kalipujaparora.org', pass: 'volunteer123', color: 'from-stone-500 to-stone-600' },
+    { role: 'Super Admin (सर्वाधिकार)', email: 'admin@kalipujaparora.org', pass: 'admin123', color: 'from-red-600 to-amber-600' },
+    { role: 'Kabaddi Admin (कबड्डी व्यवस्थापक)', email: 'kabaddi@kalipujaparora.org', pass: 'admin123', color: 'from-blue-600 to-cyan-600' },
+    { role: 'Awards Admin (मेधावी छात्र पुरस्कार)', email: 'awards@kalipujaparora.org', pass: 'admin123', color: 'from-yellow-600 to-amber-600' },
+    { role: 'Finance Admin (व्यय, बिल व लेजर)', email: 'finance@kalipujaparora.org', pass: 'admin123', color: 'from-emerald-600 to-teal-600' },
+    { role: 'Treasurer (कोषाध्यक्ष)', email: 'treasurer@kalipujaparora.org', pass: 'admin123', color: 'from-teal-600 to-emerald-700' },
+    { role: 'President (समिति अध्यक्ष)', email: 'president@kalipujaparora.org', pass: 'admin123', color: 'from-purple-600 to-indigo-600' },
+    { role: 'Secretary (महासचिव)', email: 'secretary@kalipujaparora.org', pass: 'admin123', color: 'from-indigo-600 to-blue-600' },
+    { role: 'Event Manager (कार्यक्रम)', email: 'events@kalipujaparora.org', pass: 'admin123', color: 'from-rose-600 to-pink-600' },
+    { role: 'Volunteer (स्वयंसेवक)', email: 'volunteer@kalipujaparora.org', pass: 'admin123', color: 'from-stone-600 to-stone-700' },
   ];
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -176,3 +179,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

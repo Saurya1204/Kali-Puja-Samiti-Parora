@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/lib/languageContext';
 import DiyaAnimation from './DiyaAnimation';
-import { Sparkles, Calendar, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 interface CountdownProps {
   startDate?: string | Date;
@@ -15,6 +15,7 @@ export default function FestivalCountdown({
   endDate = '2026-11-10T23:59:59Z',
 }: CountdownProps) {
   const { t } = useLanguage();
+  const [mounted, setMounted] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -24,6 +25,7 @@ export default function FestivalCountdown({
   });
 
   useEffect(() => {
+    setMounted(true);
     const calculateTime = () => {
       const now = new Date().getTime();
       const start = new Date(startDate).getTime();
@@ -61,6 +63,41 @@ export default function FestivalCountdown({
     const interval = setInterval(calculateTime, 1000);
     return () => clearInterval(interval);
   }, [startDate, endDate]);
+
+  if (!mounted) {
+    return (
+      <div className="w-full">
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <DiyaAnimation size="sm" />
+          <span className="text-xs uppercase tracking-widest text-amber-400 font-bold flex items-center gap-1">
+            <Clock className="w-3.5 h-3.5" />
+            {t('Grand Celebration Begins In', 'महोत्सव शुभारंभ में शेष समय')}
+          </span>
+          <DiyaAnimation size="sm" />
+        </div>
+        <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-lg mx-auto">
+          {[
+            { label: t('Days', 'दिन'), value: 0 },
+            { label: t('Hours', 'घंटे'), value: 0 },
+            { label: t('Minutes', 'मिनट'), value: 0 },
+            { label: t('Seconds', 'सेकंड'), value: 0 },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              className="bg-gradient-to-b from-maroon-900/90 to-maroon-950/95 border border-amber-500/40 rounded-xl p-2.5 sm:p-4 text-center shadow-md relative overflow-hidden"
+            >
+              <div className="text-2xl sm:text-4xl font-extrabold text-amber-300 font-mono tracking-tight">
+                00
+              </div>
+              <div className="text-[10px] sm:text-xs font-semibold text-amber-200/80 uppercase tracking-wider mt-1">
+                {item.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (timeLeft.status === 'LIVE') {
     return (

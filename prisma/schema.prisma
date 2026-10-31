@@ -514,3 +514,4 @@ model Volunteer {
 
   festivalYear   FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
 }
+

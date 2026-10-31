@@ -71,6 +71,27 @@ async function main() {
       phone: '+91 91223 44589',
     },
     {
+      name: 'Rajesh Kumar Mehta',
+      email: 'finance@kalipujaparora.org',
+      passwordHash,
+      role: 'FINANCE_ADMIN',
+      phone: '+91 94314 77123',
+    },
+    {
+      name: 'Shri Amarjeet Singh (Kabaddi Chief)',
+      email: 'kabaddi@kalipujaparora.org',
+      passwordHash,
+      role: 'KABADDI_ADMIN',
+      phone: '+91 98352 11984',
+    },
+    {
+      name: 'Prof. Alok Nath Jha (Pratibha Samman Head)',
+      email: 'awards@kalipujaparora.org',
+      passwordHash,
+      role: 'AWARDS_ADMIN',
+      phone: '+91 94702 33456',
+    },
+    {
       name: 'Vikash Kumar Mandal',
       email: 'events@kalipujaparora.org',
       passwordHash,
@@ -1246,3 +1267,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+

@@ -290,13 +290,32 @@ export default function DonationManager({
                   </td>
 
                   <td className="py-3.5 px-4 text-center no-print">
-                    <button
-                      onClick={() => setSelectedReceipt(d)}
-                      className="festive-btn-gold text-[10px] px-3 py-1 font-bold cursor-pointer inline-flex items-center gap-1"
-                    >
-                      <Printer className="w-3 h-3" />
-                      <span>रसीद देखें</span>
-                    </button>
+                    <div className="flex items-center justify-center gap-1.5">
+                      <button
+                        onClick={() => setSelectedReceipt(d)}
+                        className="festive-btn-gold text-[10px] px-2.5 py-1 font-bold cursor-pointer inline-flex items-center gap-1"
+                        title="आधिकारिक रसीद देखें व प्रिंट करें"
+                      >
+                        <Printer className="w-3 h-3" />
+                        <span>रसीद</span>
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (!confirm(`क्या आप ${d.donorName} का ₹${d.amount} का दान रिकॉर्ड हटाना चाहते हैं?`)) return;
+                          try {
+                            const res = await fetch(`/api/admin/donations?id=${d.id}`, { method: 'DELETE' });
+                            if (!res.ok) throw new Error('हटाने में विफल');
+                            setDonations(donations.filter((item) => item.id !== d.id));
+                          } catch (err: any) {
+                            alert(err.message);
+                          }
+                        }}
+                        className="p-1.5 bg-red-950/60 hover:bg-red-900 text-red-300 rounded cursor-pointer transition-all"
+                        title="दान रिकॉर्ड हटाएं"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -507,3 +526,4 @@ export default function DonationManager({
     </div>
   );
 }
+

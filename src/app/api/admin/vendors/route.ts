@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSessionUser, createAuditLog } from '@/lib/auth';
+import { getSessionUser, createAuditLog, ROLES } from '@/lib/auth';
 import { z } from 'zod';
 
 const VendorSchema = z.object({
@@ -21,6 +21,11 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getSessionUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const allowed = [ROLES.SUPER_ADMIN, ROLES.PRESIDENT, ROLES.TREASURER, ROLES.FINANCE_ADMIN];
+    if (!allowed.includes(user.role as any)) {
+      return NextResponse.json({ error: 'आपको वेंडर प्रबंधित करने की अनुमति नहीं है' }, { status: 403 });
+    }
 
     const body = await req.json();
     const validated = VendorSchema.parse(body);
@@ -52,5 +57,39 @@ export async function POST(req: NextRequest) {
       { error: err?.errors?.[0]?.message || err.message || 'वेंडर सहेजने में त्रुटि' },
       { status: 400 }
     );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const user = await getSessionUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const allowed = [ROLES.SUPER_ADMIN, ROLES.TREASURER, ROLES.FINANCE_ADMIN];
+    if (!allowed.includes(user.role as any)) {
+      return NextResponse.json({ error: 'आपको वेंडर हटाने की अनुमति नहीं है' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'वेंडर ID आवश्यक है' }, { status: 400 });
+
+    const vendor = await prisma.vendor.findUnique({ where: { id } });
+    if (!vendor) return NextResponse.json({ error: 'वेंडर नहीं मिला' }, { status: 404 });
+
+    await prisma.vendor.delete({ where: { id } });
+
+    await createAuditLog({
+      userId: user.id,
+      userName: user.name,
+      action: 'DELETE_VENDOR',
+      module: 'VENDORS',
+      recordId: id,
+      details: `${user.name} deleted vendor "${vendor.name}"`,
+    });
+
+    return NextResponse.json({ success: true, message: 'वेंडर सफलतापूर्वक हटा दिया गया' });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

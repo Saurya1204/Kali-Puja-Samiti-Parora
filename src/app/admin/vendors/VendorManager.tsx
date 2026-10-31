@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Receipt,
+  Trash2,
 } from 'lucide-react';
 
 interface VendorItem {
@@ -214,13 +215,33 @@ export default function VendorManager({
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   {v.serviceCategory}
                 </span>
-                <button
-                  onClick={() => openEdit(v)}
-                  className="text-stone-400 hover:text-amber-300 p-1"
-                  title="संशोधित करें"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => openEdit(v)}
+                    className="text-stone-400 hover:text-amber-300 p-1"
+                    title="संशोधित करें"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (!confirm(`क्या आप वेंडर "${v.name}" को हटाना चाहते हैं?`)) return;
+                      try {
+                        const res = await fetch(`/api/admin/vendors?id=${v.id}`, { method: 'DELETE' });
+                        if (!res.ok) throw new Error('हटाने में विफल');
+                        setVendors(vendors.filter((item) => item.id !== v.id));
+                        setFeedback('वेंडर रिकॉर्ड सफलतापूर्वक हटा दिया गया।');
+                        setTimeout(() => setFeedback(null), 3000);
+                      } catch (err: any) {
+                        alert(err.message);
+                      }
+                    }}
+                    className="text-stone-400 hover:text-red-400 p-1"
+                    title="वेंडर हटाएं"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
               <div>
@@ -398,3 +419,4 @@ export default function VendorManager({
     </div>
   );
 }
+

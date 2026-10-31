@@ -38,3 +38,4 @@ export default function DiyaAnimation({ size = 'md' }: { size?: 'sm' | 'md' | 'l
     </div>
   );
 }
+

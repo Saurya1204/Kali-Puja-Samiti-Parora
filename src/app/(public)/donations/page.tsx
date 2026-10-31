@@ -237,3 +237,4 @@ export default async function DonationsPage() {
     </div>
   );
 }
+

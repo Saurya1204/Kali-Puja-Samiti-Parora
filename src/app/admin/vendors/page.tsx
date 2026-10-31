@@ -23,3 +23,4 @@ export default async function AdminVendorsPage() {
 
   return <VendorManager initialVendors={vendors} />;
 }
+

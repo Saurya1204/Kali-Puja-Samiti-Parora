@@ -234,13 +234,33 @@ export default function EventManager({
                 {ev.status}
               </span>
 
-              <button
-                onClick={() => openEdit(ev)}
-                className="festive-btn-gold text-[10px] px-3 py-1 font-bold flex items-center gap-1 cursor-pointer"
-              >
-                <Edit2 className="w-3 h-3" />
-                <span>संपादित करें</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => openEdit(ev)}
+                  className="festive-btn-gold text-[10px] px-3 py-1 font-bold flex items-center gap-1 cursor-pointer"
+                >
+                  <Edit2 className="w-3 h-3" />
+                  <span>संपादित करें</span>
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!confirm(`क्या आप कार्यक्रम "${ev.title}" को हटाना चाहते हैं?`)) return;
+                    try {
+                      const res = await fetch(`/api/admin/events?id=${ev.id}`, { method: 'DELETE' });
+                      if (!res.ok) throw new Error('हटाने में विफल');
+                      setEvents(events.filter((item) => item.id !== ev.id));
+                      setFeedback('कार्यक्रम सफलतापूर्वक हटा दिया गया।');
+                      setTimeout(() => setFeedback(null), 3000);
+                    } catch (err: any) {
+                      alert(err.message);
+                    }
+                  }}
+                  className="p-1.5 bg-red-950/60 hover:bg-red-900 text-red-300 rounded cursor-pointer transition-all"
+                  title="कार्यक्रम हटाएं"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -402,3 +422,4 @@ export default function EventManager({
     </div>
   );
 }
+

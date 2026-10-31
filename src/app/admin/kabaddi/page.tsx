@@ -30,11 +30,17 @@ export default async function AdminKabaddiPage({
     orderBy: [{ points: 'desc' }, { matchesWon: 'desc' }],
   });
 
+  const formattedMatches = matches.map((m) => ({
+    ...m,
+    scheduledTime: m.scheduledTime ? m.scheduledTime.toISOString() : null,
+  }));
+
   return (
     <KabaddiScoreManager
-      initialMatches={matches}
+      initialMatches={formattedMatches}
       teams={teams}
       festivalYear={festivalYear?.year || 2026}
     />
   );
 }
+

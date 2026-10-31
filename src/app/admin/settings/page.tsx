@@ -23,3 +23,4 @@ export default async function AdminSettingsPage() {
 
   return <SettingsManager initialYears={years} initialSettings={settings} />;
 }
+
