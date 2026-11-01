@@ -106,8 +106,8 @@ export default async function AdminLedgerPage({
       id: e.id,
       date: e.billDate,
       type: 'EXPENSE',
-      desc: `व्यय भुगतान: ${e.title} (${e.category.nameHindi || e.category.name})${
-        e.vendor ? ` - ${e.vendor.name}` : ''
+      desc: `व्यय भुगतान: ${e.title} (${e.category?.nameHindi || e.category?.name || 'सामान्य व्यय'})${
+        e.vendor?.name ? ` - ${e.vendor.name}` : ''
       }`,
       method: e.paymentMethod,
       amount: e.paidAmount,

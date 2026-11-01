@@ -188,7 +188,7 @@ export default function EventManager({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300">
-                  {ev.category.nameHindi || ev.category.name}
+                  {ev.category?.nameHindi || ev.category?.name || 'सामान्य'}
                 </span>
                 <span className="text-xs text-stone-400 font-mono">{formatDate(ev.date)}</span>
               </div>

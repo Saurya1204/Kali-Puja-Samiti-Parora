@@ -98,6 +98,21 @@ export function buildMongoFilter(where: any = {}): any {
       } else {
         filter._id = val;
       }
+    } else if (key.includes('_') && typeof val === 'object' && val !== null && !Array.isArray(val) && !(val instanceof Date)) {
+      // Handles Prisma composite unique keys, e.g. budgetId_categoryId: { budgetId: '...', categoryId: '...' }
+      const isOperator = Object.keys(val).some((k) =>
+        ['in', 'nin', 'gte', 'lte', 'gt', 'lt', 'contains', 'mode', 'not'].includes(k)
+      );
+      if (!isOperator) {
+        for (const [subKey, subVal] of Object.entries(val)) {
+          if (subKey.endsWith('Id') && typeof subVal === 'string' && ObjectId.isValid(subVal)) {
+            filter[subKey] = { $in: [subVal, new ObjectId(subVal)] };
+          } else {
+            filter[subKey] = subVal;
+          }
+        }
+        continue;
+      }
     } else if (key.endsWith('Id') && typeof val === 'string' && ObjectId.isValid(val)) {
       // Handles foreign keys stored as ObjectId or string
       filter[key] = { $in: [val, new ObjectId(val)] };
@@ -164,32 +179,91 @@ export function buildMongoSort(orderBy: any): any {
 async function hydrateRelations(database: any, collectionName: string, doc: any, include: any): Promise<any> {
   if (!doc || !include) return doc;
 
-  // Hydrate Category for Event
-  if (include.category && doc.categoryId) {
-    const cat = await database.collection('EventCategory').findOne({
-      _id: toMongoId(doc.categoryId),
-    });
-    doc.category = normalizeDoc(cat);
+  // 1. Hydrate Category (Expense, Bill, BudgetAllocation -> ExpenseCategory; Event -> EventCategory)
+  if (include.category) {
+    const isExpenseRel = ['Expense', 'Bill', 'BudgetAllocation'].includes(collectionName);
+    const catColl = isExpenseRel ? 'ExpenseCategory' : 'EventCategory';
+    const defaultNameHindi = isExpenseRel ? 'सामान्य व्यय' : 'सामान्य कार्यक्रम';
+
+    if (doc.categoryId) {
+      const cat = await database.collection(catColl).findOne({
+        _id: toMongoId(doc.categoryId),
+      });
+      doc.category = normalizeDoc(cat) || {
+        id: String(doc.categoryId),
+        name: 'General',
+        nameHindi: defaultNameHindi,
+        slug: 'general',
+      };
+    } else {
+      doc.category = {
+        id: 'default',
+        name: 'General',
+        nameHindi: defaultNameHindi,
+        slug: 'general',
+      };
+    }
   }
 
-  // Hydrate Event for Registration
+  // 2. Hydrate Vendor for Expense / Bill
+  if (include.vendor) {
+    if (doc.vendorId) {
+      const v = await database.collection('Vendor').findOne({
+        _id: toMongoId(doc.vendorId),
+      });
+      doc.vendor = normalizeDoc(v);
+    } else {
+      doc.vendor = null;
+    }
+  }
+
+  // 3. Hydrate FestivalYear
+  if (include.festivalYear && doc.festivalYearId) {
+    const fy = await database.collection('FestivalYear').findOne({
+      _id: toMongoId(doc.festivalYearId),
+    });
+    doc.festivalYear = normalizeDoc(fy);
+  }
+
+  // 4. Hydrate Event for Registration
   if (include.event && doc.eventId) {
     const ev = await database.collection('Event').findOne({
       _id: toMongoId(doc.eventId),
     });
-    doc.event = normalizeDoc(ev);
+    const normEv = normalizeDoc(ev);
+    if (normEv) {
+      if (include.event?.include?.category || !normEv.category) {
+        if (normEv.categoryId) {
+          const cat = await database.collection('EventCategory').findOne({
+            _id: toMongoId(normEv.categoryId),
+          });
+          normEv.category = normalizeDoc(cat) || { name: 'General', nameHindi: 'सामान्य कार्यक्रम' };
+        } else {
+          normEv.category = { name: 'General', nameHindi: 'सामान्य कार्यक्रम' };
+        }
+      }
+    }
+    doc.event = normEv;
   }
 
-  // Hydrate Players for Kabaddi Team
+  // 5. Hydrate Registrations for Event
+  if (include.registrations) {
+    const regs = await database.collection('EventRegistration').find({
+      eventId: { $in: [doc.id, toMongoId(doc.id)] },
+    }).toArray();
+    doc.registrations = normalizeDoc(regs) || [];
+  }
+
+  // 6. Hydrate Players for Kabaddi Team
   if (include.players) {
     const players = await database
       .collection('KabaddiPlayer')
       .find({ teamId: { $in: [doc.id, toMongoId(doc.id)] } })
       .toArray();
-    doc.players = normalizeDoc(players);
+    doc.players = normalizeDoc(players) || [];
   }
 
-  // Hydrate Teams for Kabaddi Match
+  // 7. Hydrate Teams for Kabaddi Match
   if (include.teamA && doc.teamAId) {
     const teamA = await database.collection('KabaddiTeam').findOne({
       _id: toMongoId(doc.teamAId),
@@ -203,7 +277,7 @@ async function hydrateRelations(database: any, collectionName: string, doc: any,
     doc.teamB = normalizeDoc(teamB);
   }
 
-  // Hydrate Media for Gallery
+  // 8. Hydrate Media for Gallery
   if (include.media) {
     let cursor = database.collection('GalleryMedia').find({
       galleryId: { $in: [doc.id, toMongoId(doc.id)] },
@@ -212,10 +286,34 @@ async function hydrateRelations(database: any, collectionName: string, doc: any,
       cursor = cursor.limit(include.media.take);
     }
     const media = await cursor.toArray();
-    doc.media = normalizeDoc(media);
+    doc.media = normalizeDoc(media) || [];
   }
 
-  // Hydrate Festival Year Children (events, matches, achievements, sponsors, donations, galleries)
+  // 9. Hydrate BudgetAllocations for ExpenseCategory
+  if (include.budgetAllocations) {
+    const allocs = await database.collection('BudgetAllocation').find({
+      categoryId: { $in: [doc.id, toMongoId(doc.id)] },
+    }).toArray();
+    doc.budgetAllocations = normalizeDoc(allocs) || [];
+  }
+
+  // 10. Hydrate Expenses for ExpenseCategory
+  if (include.expenses && collectionName === 'ExpenseCategory') {
+    const exps = await database.collection('Expense').find({
+      categoryId: { $in: [doc.id, toMongoId(doc.id)] },
+    }).toArray();
+    doc.expenses = normalizeDoc(exps) || [];
+  }
+
+  // 11. Hydrate Bills for Expense
+  if (include.bills) {
+    const bills = await database.collection('Bill').find({
+      expenseId: { $in: [doc.id, toMongoId(doc.id)] },
+    }).toArray();
+    doc.bills = normalizeDoc(bills) || [];
+  }
+
+  // 12. Hydrate Festival Year Children (events, matches, achievements, sponsors, donations, galleries, expenses)
   if (collectionName === 'FestivalYear') {
     const yearIdFilter = { festivalYearId: { $in: [doc.id, toMongoId(doc.id)] } };
 
@@ -223,24 +321,26 @@ async function hydrateRelations(database: any, collectionName: string, doc: any,
       let cursor = database.collection('Event').find(yearIdFilter);
       if (include.events.take) cursor = cursor.limit(include.events.take);
       const events = await cursor.toArray();
-      // Also hydrate event categories if asked
-      if (include.events.include?.category) {
-        for (const ev of events) {
-          if (ev.categoryId) {
-            const cat = await database.collection('EventCategory').findOne({ _id: toMongoId(ev.categoryId) });
-            ev.category = normalizeDoc(cat);
-          }
+      const normEvents = normalizeDoc(events) || [];
+      // Always hydrate event categories safely
+      for (const ev of normEvents) {
+        if (ev.categoryId) {
+          const cat = await database.collection('EventCategory').findOne({ _id: toMongoId(ev.categoryId) });
+          ev.category = normalizeDoc(cat) || { name: 'General', nameHindi: 'सामान्य कार्यक्रम' };
+        } else {
+          ev.category = { name: 'General', nameHindi: 'सामान्य कार्यक्रम' };
         }
       }
-      doc.events = normalizeDoc(events);
+      doc.events = normEvents;
     }
 
     if (include.kabaddiMatches) {
       let cursor = database.collection('KabaddiMatch').find(yearIdFilter);
       if (include.kabaddiMatches.take) cursor = cursor.limit(include.kabaddiMatches.take);
       const matches = await cursor.toArray();
+      const normMatches = normalizeDoc(matches) || [];
       if (include.kabaddiMatches.include?.teamA || include.kabaddiMatches.include?.teamB) {
-        for (const m of matches) {
+        for (const m of normMatches) {
           if (m.teamAId) {
             const tA = await database.collection('KabaddiTeam').findOne({ _id: toMongoId(m.teamAId) });
             m.teamA = normalizeDoc(tA);
@@ -251,48 +351,65 @@ async function hydrateRelations(database: any, collectionName: string, doc: any,
           }
         }
       }
-      doc.kabaddiMatches = normalizeDoc(matches);
+      doc.kabaddiMatches = normMatches;
     }
 
     if (include.studentAchievements) {
       let cursor = database.collection('StudentAchievement').find(yearIdFilter);
       if (include.studentAchievements.take) cursor = cursor.limit(include.studentAchievements.take);
       const achievements = await cursor.toArray();
-      doc.studentAchievements = normalizeDoc(achievements);
+      doc.studentAchievements = normalizeDoc(achievements) || [];
     }
 
     if (include.sponsors) {
       let cursor = database.collection('Sponsor').find(yearIdFilter);
       if (include.sponsors.take) cursor = cursor.limit(include.sponsors.take);
       const sponsors = await cursor.toArray();
-      doc.sponsors = normalizeDoc(sponsors);
+      doc.sponsors = normalizeDoc(sponsors) || [];
     }
 
     if (include.donations) {
       let cursor = database.collection('Donation').find(yearIdFilter);
       if (include.donations.take) cursor = cursor.limit(include.donations.take);
       const donations = await cursor.toArray();
-      doc.donations = normalizeDoc(donations);
+      doc.donations = normalizeDoc(donations) || [];
+    }
+
+    if (include.expenses) {
+      let cursor = database.collection('Expense').find(yearIdFilter);
+      if (include.expenses.take) cursor = cursor.limit(include.expenses.take);
+      const expenses = await cursor.toArray();
+      const normExp = normalizeDoc(expenses) || [];
+      for (const e of normExp) {
+        if (e.categoryId) {
+          const cat = await database.collection('ExpenseCategory').findOne({ _id: toMongoId(e.categoryId) });
+          e.category = normalizeDoc(cat) || { name: 'General', nameHindi: 'सामान्य व्यय' };
+        } else {
+          e.category = { name: 'General', nameHindi: 'सामान्य व्यय' };
+        }
+      }
+      doc.expenses = normExp;
     }
 
     if (include.galleries) {
       let cursor = database.collection('Gallery').find(yearIdFilter);
       if (include.galleries.take) cursor = cursor.limit(include.galleries.take);
       const galleries = await cursor.toArray();
+      const normGalleries = normalizeDoc(galleries) || [];
       if (include.galleries.include?.media) {
-        for (const g of galleries) {
+        for (const g of normGalleries) {
           const media = await database.collection('GalleryMedia').find({ galleryId: { $in: [g._id, g._id.toString()] } }).limit(1).toArray();
-          g.media = normalizeDoc(media);
+          g.media = normalizeDoc(media) || [];
         }
       }
-      doc.galleries = normalizeDoc(galleries);
+      doc.galleries = normGalleries;
     }
 
     if (include.announcements) {
       let cursor = database.collection('Announcement').find(yearIdFilter);
       if (include.announcements.take) cursor = cursor.limit(include.announcements.take);
       const announcements = await cursor.toArray();
-      doc.announcements = normalizeDoc(announcements);
+      doc.announcements = normalizeDoc(announcements) || [];
     }
   }
 

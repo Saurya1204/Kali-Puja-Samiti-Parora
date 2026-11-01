@@ -207,7 +207,7 @@ export default function ExpenseManager({
   const handleExportExcel = () => {
     const exportData = filtered.map((e) => ({
       'शीर्षक (Title)': e.title,
-      'मद / श्रेणी (Category)': e.category.nameHindi || e.category.name,
+      'मद / श्रेणी (Category)': e.category?.nameHindi || e.category?.name || 'सामान्य व्यय',
       'वेंडर (Vendor)': e.vendor?.name || 'N/A',
       'बिल क्रमांक (Bill No)': e.billNumber || 'N/A',
       'बिल दिनांक (Bill Date)': formatDate(e.billDate),
@@ -401,7 +401,7 @@ export default function ExpenseManager({
                     <td className="py-3.5 px-4">
                       <div className="font-bold text-stone-100">{exp.title}</div>
                       <span className="text-[11px] text-stone-400">
-                        {exp.category.nameHindi || exp.category.name}
+                        {exp.category?.nameHindi || exp.category?.name || 'सामान्य व्यय'}
                       </span>
                     </td>
 

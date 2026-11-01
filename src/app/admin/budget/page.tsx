@@ -33,14 +33,14 @@ export default async function AdminBudgetPage({
     },
   });
 
-  const allocations = categories.map((cat) => {
-    const allocated = cat.budgetAllocations[0]?.allocatedAmount || 0;
-    const spent = cat.expenses.reduce((sum, e) => sum + e.amount, 0);
+  const allocations = (categories || []).map((cat: any) => {
+    const allocated = cat?.budgetAllocations?.[0]?.allocatedAmount || 0;
+    const spent = (cat?.expenses || []).reduce((sum: number, e: any) => sum + (e?.amount || 0), 0);
 
     return {
       categoryId: cat.id,
       categoryName: cat.name,
-      categoryNameHindi: cat.nameHindi,
+      categoryNameHindi: cat.nameHindi || cat.name,
       allocated,
       spent,
     };

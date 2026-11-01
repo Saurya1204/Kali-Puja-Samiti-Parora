@@ -26,93 +26,112 @@ export default async function AdminDashboardPage({
 }: {
   searchParams?: { festivalYear?: string };
 }) {
-  const reqYear = searchParams?.festivalYear ? parseInt(searchParams.festivalYear) : undefined;
+  let festivalYear: any = null;
+  let donations: any[] = [];
+  let expenses: any[] = [];
+  let recentExpenses: any[] = [];
+  let recentDonations: any[] = [];
+  let openingBalance = 0;
+  let registrationsCount = 0;
+  let pendingRegistrationsCount = 0;
+  let studentCount = 0;
+  let pendingStudentCount = 0;
+  let kabaddiTeamsCount = 0;
+  let eventsCount = 0;
+  let sponsorsCount = 0;
 
-  let festivalYear = reqYear
-    ? await prisma.festivalYear.findUnique({ where: { year: reqYear } })
-    : await prisma.festivalYear.findFirst({ where: { isActive: true } });
+  try {
+    const reqYear = searchParams?.festivalYear ? parseInt(searchParams.festivalYear) : undefined;
 
-  if (!festivalYear) {
-    festivalYear = await prisma.festivalYear.findFirst({ orderBy: { year: 'desc' } });
+    festivalYear = reqYear
+      ? await prisma.festivalYear.findUnique({ where: { year: reqYear } })
+      : await prisma.festivalYear.findFirst({ where: { isActive: true } });
+
+    if (!festivalYear) {
+      festivalYear = await prisma.festivalYear.findFirst({ orderBy: { year: 'desc' } });
+    }
+
+    const yearId = festivalYear?.id;
+
+    // 1. Calculate Total Donations
+    donations = await prisma.donation.findMany({
+      where: { festivalYearId: yearId, status: 'CONFIRMED' },
+    });
+
+    // 2. Calculate Total Expenses
+    expenses = await prisma.expense.findMany({
+      where: { festivalYearId: yearId, approvalStatus: 'APPROVED' },
+      include: { category: true, vendor: true },
+    });
+
+    // 3. Opening Balance
+    const openingTxn = await prisma.financialTransaction.findFirst({
+      where: { festivalYearId: yearId, referenceType: 'OPENING_BALANCE' },
+    });
+    openingBalance = openingTxn?.amount || 0;
+
+    // 4. Counts
+    registrationsCount = await prisma.eventRegistration.count({
+      where: { festivalYearId: yearId },
+    });
+    pendingRegistrationsCount = await prisma.eventRegistration.count({
+      where: { festivalYearId: yearId, status: 'PENDING' },
+    });
+
+    studentCount = await prisma.studentAchievement.count({
+      where: { festivalYearId: yearId },
+    });
+    pendingStudentCount = await prisma.studentAchievement.count({
+      where: { festivalYearId: yearId, status: 'PENDING' },
+    });
+
+    kabaddiTeamsCount = await prisma.kabaddiTeam.count({
+      where: { festivalYearId: yearId },
+    });
+
+    eventsCount = await prisma.event.count({
+      where: { festivalYearId: yearId },
+    });
+
+    sponsorsCount = await prisma.sponsor.count({
+      where: { festivalYearId: yearId },
+    });
+
+    // 6. Recent expenses & bills
+    recentExpenses = await prisma.expense.findMany({
+      where: { festivalYearId: yearId },
+      include: { category: true, vendor: true },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    });
+
+    // 7. Recent donations
+    recentDonations = await prisma.donation.findMany({
+      where: { festivalYearId: yearId },
+      orderBy: { donationDate: 'desc' },
+      take: 5,
+    });
+  } catch (err) {
+    console.error('Error fetching admin dashboard data:', err);
   }
 
-  const yearId = festivalYear?.id;
+  const totalDonations = donations.reduce((sum: number, d: any) => sum + (d?.amount || 0), 0);
+  const totalExpenses = expenses.reduce((sum: number, e: any) => sum + (e?.amount || 0), 0);
+  const totalPaidExpenses = expenses.reduce((sum: number, e: any) => sum + (e?.paidAmount || 0), 0);
+  const totalOutstandingExpenses = expenses.reduce((sum: number, e: any) => sum + (e?.outstandingAmount || 0), 0);
 
-  // 1. Calculate Total Donations
-  const donations = await prisma.donation.findMany({
-    where: { festivalYearId: yearId, status: 'CONFIRMED' },
-  });
-  const totalDonations = donations.reduce((sum, d) => sum + d.amount, 0);
-
-  // 2. Calculate Total Expenses
-  const expenses = await prisma.expense.findMany({
-    where: { festivalYearId: yearId, approvalStatus: 'APPROVED' },
-    include: { category: true, vendor: true },
-  });
-  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const totalPaidExpenses = expenses.reduce((sum, e) => sum + e.paidAmount, 0);
-  const totalOutstandingExpenses = expenses.reduce((sum, e) => sum + e.outstandingAmount, 0);
-
-  // 3. Available Balance
-  // Opening balance carries forward
-  const openingTxn = await prisma.financialTransaction.findFirst({
-    where: { festivalYearId: yearId, referenceType: 'OPENING_BALANCE' },
-  });
-  const openingBalance = openingTxn?.amount || 0;
   const totalIncome = openingBalance + totalDonations;
   const availableBalance = totalIncome - totalPaidExpenses;
 
-  // 4. Counts
-  const registrationsCount = await prisma.eventRegistration.count({
-    where: { festivalYearId: yearId },
-  });
-  const pendingRegistrationsCount = await prisma.eventRegistration.count({
-    where: { festivalYearId: yearId, status: 'PENDING' },
-  });
-
-  const studentCount = await prisma.studentAchievement.count({
-    where: { festivalYearId: yearId },
-  });
-  const pendingStudentCount = await prisma.studentAchievement.count({
-    where: { festivalYearId: yearId, status: 'PENDING' },
-  });
-
-  const kabaddiTeamsCount = await prisma.kabaddiTeam.count({
-    where: { festivalYearId: yearId },
-  });
-
-  const eventsCount = await prisma.event.count({
-    where: { festivalYearId: yearId },
-  });
-
-  const sponsorsCount = await prisma.sponsor.count({
-    where: { festivalYearId: yearId },
-  });
-
   // 5. Category-wise expense breakdown for chart
   const catMap: Record<string, number> = {};
-  expenses.forEach((e) => {
-    const catName = e.category.nameHindi || e.category.name;
-    catMap[catName] = (catMap[catName] || 0) + e.amount;
+  (expenses || []).forEach((e: any) => {
+    const catName = e?.category?.nameHindi || e?.category?.name || 'सामान्य व्यय';
+    catMap[catName] = (catMap[catName] || 0) + (e?.amount || 0);
   });
   const categoryChartData = Object.entries(catMap)
     .map(([name, amount]) => ({ name, amount }))
     .sort((a, b) => b.amount - a.amount);
-
-  // 6. Recent expenses & bills
-  const recentExpenses = await prisma.expense.findMany({
-    where: { festivalYearId: yearId },
-    include: { category: true, vendor: true },
-    orderBy: { createdAt: 'desc' },
-    take: 5,
-  });
-
-  // 7. Recent donations
-  const recentDonations = await prisma.donation.findMany({
-    where: { festivalYearId: yearId },
-    orderBy: { donationDate: 'desc' },
-    take: 5,
-  });
 
   const incomeVsExpense = [
     {
@@ -322,8 +341,8 @@ export default async function AdminDashboardPage({
                 <div>
                   <h5 className="font-bold text-stone-200">{exp.title}</h5>
                   <div className="text-[11px] text-stone-400">
-                    {exp.category.nameHindi || exp.category.name}
-                    {exp.vendor ? ` • ${exp.vendor.name}` : ''}
+                    {exp.category?.nameHindi || exp.category?.name || 'सामान्य व्यय'}
+                    {exp.vendor?.name ? ` • ${exp.vendor.name}` : ''}
                   </div>
                   <span className="text-[10px] text-stone-500 font-mono">
                     {formatDate(exp.billDate)} • बिल #{exp.billNumber || 'N/A'}

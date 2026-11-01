@@ -458,7 +458,7 @@ export default async function HomePage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                    {event.category.nameHindi || event.category.name}
+                    {event.category?.nameHindi || event.category?.name || 'कार्यक्रम'}
                   </span>
                   <span className="text-xs text-amber-200/70 font-medium">
                     {formatDate(event.date)}

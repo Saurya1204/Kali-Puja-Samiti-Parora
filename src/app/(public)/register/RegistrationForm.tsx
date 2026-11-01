@@ -198,7 +198,7 @@ export default function RegistrationForm({
           >
             {events.map((ev) => (
               <option key={ev.id} value={ev.id}>
-                {ev.titleHindi || ev.title} ({ev.category.nameHindi || ev.category.name})
+                {ev.titleHindi || ev.title} ({ev.category?.nameHindi || ev.category?.name || 'सामान्य'})
               </option>
             ))}
           </select>

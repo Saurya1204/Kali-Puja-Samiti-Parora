@@ -117,7 +117,7 @@ export default async function EventsPage({
                 {/* Top Badge & Date */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                    {ev.category.nameHindi || ev.category.name}
+                    {ev.category?.nameHindi || ev.category?.name || 'सामान्य कार्यक्रम'}
                   </span>
                   <div className="flex items-center gap-1.5 text-xs text-amber-200/90 font-semibold bg-black/40 px-3 py-1 rounded-full border border-amber-900/60">
                     <Calendar className="w-3.5 h-3.5 text-amber-400" />

@@ -81,7 +81,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Navigation Links (Compact & Tiered so it NEVER crowds or collides with logo) */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 shrink-0">
+          <nav className="hidden xl:flex items-center gap-1 xl:gap-1.5 shrink-0">
             {primaryLinks.map((link) => {
               const Icon = link.icon;
               const isActive = pathname === link.href;
@@ -144,7 +144,7 @@ export default function Navbar() {
           </nav>
 
           {/* Controls: Language, Donate, Admin */}
-          <div className="hidden sm:flex items-center gap-2 lg:gap-2.5 shrink-0">
+          <div className="hidden xl:flex items-center gap-2 xl:gap-2.5 shrink-0">
             {/* Language Switcher */}
             <div className="flex items-center bg-black/60 border border-amber-600/40 rounded-full p-0.5 text-xs">
               <button
@@ -186,7 +186,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile menu trigger and fast action buttons */}
-          <div className="flex items-center gap-1.5 sm:gap-2 lg:hidden shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 xl:hidden shrink-0">
             {/* Quick Mobile Language Toggle */}
             <button
               onClick={() => setLang(lang === 'hi' ? 'en' : 'hi')}

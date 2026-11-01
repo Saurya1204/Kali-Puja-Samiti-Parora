@@ -46,10 +46,10 @@ export default async function AdminReportsPage({
 
   // 3. Category Expenses
   const catMap: Record<string, { amount: number; count: number }> = {};
-  rawExpenses.forEach((e) => {
-    const name = e.category.nameHindi || e.category.name;
+  (rawExpenses || []).forEach((e: any) => {
+    const name = e?.category?.nameHindi || e?.category?.name || 'अन्य व्यय';
     if (!catMap[name]) catMap[name] = { amount: 0, count: 0 };
-    catMap[name].amount += e.amount;
+    catMap[name].amount += e?.amount || 0;
     catMap[name].count += 1;
   });
   const categoryExpenses = Object.entries(catMap).map(([name, val]) => ({
