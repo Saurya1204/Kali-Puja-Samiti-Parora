@@ -35,7 +35,18 @@ export async function POST(req: NextRequest) {
 
     const encodedSession = Buffer.from(JSON.stringify(sessionPayload)).toString('base64');
 
-    cookies().set('kps_session', encodedSession, {
+    // Set Session Cookie directly on the returned response
+    const response = NextResponse.json({
+      success: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+
+    response.cookies.set('kps_session', encodedSession, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -52,15 +63,7 @@ export async function POST(req: NextRequest) {
       details: `User logged in with role ${user.role}`,
     });
 
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    });
+    return response;
   } catch (err: any) {
     console.error('Login error:', err);
     return NextResponse.json({ error: 'लॉगिन प्रक्रिया में त्रुटि' }, { status: 500 });

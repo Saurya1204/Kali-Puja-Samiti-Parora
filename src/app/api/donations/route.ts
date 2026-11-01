@@ -21,12 +21,27 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = DonationSchema.parse(body);
 
-    const activeYear = await prisma.festivalYear.findFirst({
+    let activeYear = await prisma.festivalYear.findFirst({
       where: { isActive: true },
     });
 
     if (!activeYear) {
-      return NextResponse.json({ error: 'Active festival year not found' }, { status: 400 });
+      activeYear = await prisma.festivalYear.findFirst({
+        orderBy: { year: 'desc' },
+      });
+    }
+
+    if (!activeYear) {
+      activeYear = await prisma.festivalYear.create({
+        data: {
+          year: 2026,
+          name: 'Kali Puja Utsav 2026',
+          startDate: new Date('2026-11-09T08:00:00Z'),
+          endDate: new Date('2026-11-10T23:59:59Z'),
+          venue: 'Maa Kali Mandir Parisar, Parora, Begusarai - 851217',
+          isActive: true,
+        },
+      });
     }
 
     const receiptNumber = generateReceiptNumber();

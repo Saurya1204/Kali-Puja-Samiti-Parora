@@ -23,19 +23,34 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = StudentSchema.parse(body);
 
-    const activeYear = await prisma.festivalYear.findFirst({
+    let activeYear = await prisma.festivalYear.findFirst({
       where: { isActive: true },
     });
 
     if (!activeYear) {
-      return NextResponse.json({ error: 'Active festival year not found' }, { status: 400 });
+      activeYear = await prisma.festivalYear.findFirst({
+        orderBy: { year: 'desc' },
+      });
+    }
+
+    if (!activeYear) {
+      activeYear = await prisma.festivalYear.create({
+        data: {
+          year: 2026,
+          name: 'Kali Puja Utsav 2026',
+          startDate: new Date('2026-11-09T08:00:00Z'),
+          endDate: new Date('2026-11-10T23:59:59Z'),
+          venue: 'Maa Kali Mandir Parisar, Parora, Begusarai - 851217',
+          isActive: true,
+        },
+      });
     }
 
     const student = await prisma.studentAchievement.create({
       data: {
         festivalYearId: activeYear.id,
         studentName: validated.studentName,
-        guardianName: validated.guardianName,
+        guardianName: validated.guardianName || null,
         village: validated.village,
         schoolOrCollege: validated.schoolOrCollege,
         courseOrClass: validated.courseOrClass,
@@ -44,9 +59,9 @@ export async function POST(req: NextRequest) {
         marksPercentageOrRank: validated.marksPercentageOrRank,
         yearOfPassing: validated.yearOfPassing,
         contactNumber: validated.contactNumber,
-        certificateUrl: validated.certificateUrl,
-        photoUrl: validated.photoUrl,
-        remarks: validated.remarks,
+        certificateUrl: validated.certificateUrl || null,
+        photoUrl: validated.photoUrl || null,
+        remarks: validated.remarks || null,
         status: 'PENDING',
         isPublished: false,
       },
@@ -59,10 +74,11 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('Student submission error:', error);
-    return NextResponse.json(
-      { error: error?.errors?.[0]?.message || 'आवेदन सबमिट करने में त्रुटि हुई।' },
-      { status: 400 }
-    );
+    const errorMsg =
+      error?.errors?.[0]?.message ||
+      (error?.message ? String(error.message) : null) ||
+      'आवेदन सबमिट करने में त्रुटि हुई।';
+    return NextResponse.json({ error: errorMsg }, { status: 400 });
   }
 }
 
