@@ -258,7 +258,13 @@ async function hydrateRelations(database: any, collectionName: string, doc: any,
   if (include.players) {
     const players = await database
       .collection('KabaddiPlayer')
-      .find({ teamId: { $in: [doc.id, toMongoId(doc.id)] } })
+      .find({
+        $or: [
+          { teamId: doc.id },
+          { teamId: String(doc.id) },
+          { teamId: toMongoId(doc.id) },
+        ],
+      })
       .toArray();
     doc.players = normalizeDoc(players) || [];
   }
@@ -311,6 +317,17 @@ async function hydrateRelations(database: any, collectionName: string, doc: any,
       expenseId: { $in: [doc.id, toMongoId(doc.id)] },
     }).toArray();
     doc.bills = normalizeDoc(bills) || [];
+  }
+
+  // 12. Hydrate Team for Kabaddi Player
+  if (include.team && doc.teamId) {
+    const team = await database.collection('KabaddiTeam').findOne({
+      $or: [
+        { _id: toMongoId(doc.teamId) },
+        { id: String(doc.teamId) },
+      ],
+    });
+    doc.team = normalizeDoc(team) || { teamName: 'टीम' };
   }
 
   // 12. Hydrate Festival Year Children (events, matches, achievements, sponsors, donations, galleries, expenses)
@@ -491,16 +508,35 @@ function createCollectionHandler(collectionName: string) {
       return { count: result.insertedCount };
     },
 
-    async update({ where, data }: any = {}) {
+    async update({ where, data, include }: any = {}) {
       const database = await getDb();
       const filter = buildMongoFilter(where);
-      const updateData = { ...data, updatedAt: new Date() };
-      delete updateData.id;
-      delete updateData._id;
+      const setFields: any = { updatedAt: new Date() };
+      const incFields: any = {};
 
-      await database.collection(collectionName).updateOne(filter, { $set: updateData });
+      for (const [k, v] of Object.entries(data || {})) {
+        if (k === 'id' || k === '_id' || v === undefined) continue;
+        if (v && typeof v === 'object' && 'increment' in (v as any)) {
+          incFields[k] = (v as any).increment;
+        } else if (v && typeof v === 'object' && 'decrement' in (v as any)) {
+          incFields[k] = -(v as any).decrement;
+        } else {
+          setFields[k] = v;
+        }
+      }
+
+      const updateOp: any = { $set: setFields };
+      if (Object.keys(incFields).length > 0) {
+        updateOp.$inc = incFields;
+      }
+
+      await database.collection(collectionName).updateOne(filter, updateOp);
       const updated = await database.collection(collectionName).findOne(filter);
-      return normalizeDoc(updated);
+      const normalized = normalizeDoc(updated);
+      if (normalized && include) {
+        await hydrateRelations(database, collectionName, normalized, include);
+      }
+      return normalized;
     },
 
     async updateMany({ where, data }: any = {}) {
@@ -618,6 +654,18 @@ export const mongodb = new Proxy(
       if (prop === '$connect') {
         return async () => {
           await getDb();
+        };
+      }
+
+      if (prop === '$transaction') {
+        return async (arg: any) => {
+          if (typeof arg === 'function') {
+            return await arg(mongodb);
+          }
+          if (Array.isArray(arg)) {
+            return await Promise.all(arg);
+          }
+          return arg;
         };
       }
 

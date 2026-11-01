@@ -53,64 +53,77 @@ export default async function AdminDashboardPage({
 
     const yearId = festivalYear?.id;
 
-    // 1. Calculate Total Donations
-    donations = await prisma.donation.findMany({
-      where: { festivalYearId: yearId, status: 'CONFIRMED' },
-    });
+    // Parallel concurrent fetch of all dashboard metrics and recent activity
+    const [
+      donationsRes,
+      expensesRes,
+      openingTxn,
+      regCount,
+      pendingRegCount,
+      studCount,
+      pendingStudCount,
+      kabaddiCount,
+      evCount,
+      sponCount,
+      recentExp,
+      recentDon,
+    ] = await Promise.all([
+      prisma.donation.findMany({
+        where: { festivalYearId: yearId, status: 'CONFIRMED' },
+      }),
+      prisma.expense.findMany({
+        where: { festivalYearId: yearId, approvalStatus: 'APPROVED' },
+        include: { category: true, vendor: true },
+      }),
+      prisma.financialTransaction.findFirst({
+        where: { festivalYearId: yearId, referenceType: 'OPENING_BALANCE' },
+      }),
+      prisma.eventRegistration.count({
+        where: { festivalYearId: yearId },
+      }),
+      prisma.eventRegistration.count({
+        where: { festivalYearId: yearId, status: 'PENDING' },
+      }),
+      prisma.studentAchievement.count({
+        where: { festivalYearId: yearId },
+      }),
+      prisma.studentAchievement.count({
+        where: { festivalYearId: yearId, status: 'PENDING' },
+      }),
+      prisma.kabaddiTeam.count({
+        where: { festivalYearId: yearId },
+      }),
+      prisma.event.count({
+        where: { festivalYearId: yearId },
+      }),
+      prisma.sponsor.count({
+        where: { festivalYearId: yearId },
+      }),
+      prisma.expense.findMany({
+        where: { festivalYearId: yearId },
+        include: { category: true, vendor: true },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+      }),
+      prisma.donation.findMany({
+        where: { festivalYearId: yearId },
+        orderBy: { donationDate: 'desc' },
+        take: 5,
+      }),
+    ]);
 
-    // 2. Calculate Total Expenses
-    expenses = await prisma.expense.findMany({
-      where: { festivalYearId: yearId, approvalStatus: 'APPROVED' },
-      include: { category: true, vendor: true },
-    });
-
-    // 3. Opening Balance
-    const openingTxn = await prisma.financialTransaction.findFirst({
-      where: { festivalYearId: yearId, referenceType: 'OPENING_BALANCE' },
-    });
+    donations = donationsRes || [];
+    expenses = expensesRes || [];
     openingBalance = openingTxn?.amount || 0;
-
-    // 4. Counts
-    registrationsCount = await prisma.eventRegistration.count({
-      where: { festivalYearId: yearId },
-    });
-    pendingRegistrationsCount = await prisma.eventRegistration.count({
-      where: { festivalYearId: yearId, status: 'PENDING' },
-    });
-
-    studentCount = await prisma.studentAchievement.count({
-      where: { festivalYearId: yearId },
-    });
-    pendingStudentCount = await prisma.studentAchievement.count({
-      where: { festivalYearId: yearId, status: 'PENDING' },
-    });
-
-    kabaddiTeamsCount = await prisma.kabaddiTeam.count({
-      where: { festivalYearId: yearId },
-    });
-
-    eventsCount = await prisma.event.count({
-      where: { festivalYearId: yearId },
-    });
-
-    sponsorsCount = await prisma.sponsor.count({
-      where: { festivalYearId: yearId },
-    });
-
-    // 6. Recent expenses & bills
-    recentExpenses = await prisma.expense.findMany({
-      where: { festivalYearId: yearId },
-      include: { category: true, vendor: true },
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-    });
-
-    // 7. Recent donations
-    recentDonations = await prisma.donation.findMany({
-      where: { festivalYearId: yearId },
-      orderBy: { donationDate: 'desc' },
-      take: 5,
-    });
+    registrationsCount = regCount || 0;
+    pendingRegistrationsCount = pendingRegCount || 0;
+    studentCount = studCount || 0;
+    pendingStudentCount = pendingStudCount || 0;
+    kabaddiTeamsCount = kabaddiCount || 0;
+    eventsCount = evCount || 0;
+    sponsorsCount = sponCount || 0;
+    recentExpenses = recentExp || [];
+    recentDonations = recentDon || [];
   } catch (err) {
     console.error('Error fetching admin dashboard data:', err);
   }
@@ -144,37 +157,37 @@ export default async function AdminDashboardPage({
   return (
     <div className="space-y-8">
       {/* Top Banner with Festival Context */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-amber-900/40 pb-4">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-amber-900/40 pb-4">
         <div>
-          <span className="text-xs uppercase font-extrabold tracking-widest text-amber-400 block">
+          <span className="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-amber-400 block">
             Executive Summary & Analytics
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-amber-200 font-serif">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-amber-200 font-serif leading-snug">
             प्रशासनिक नियंत्रण कक्ष ({festivalYear?.name || '2026'})
           </h1>
-          <p className="text-xs text-stone-400 mt-0.5">
+          <p className="text-[11px] sm:text-xs text-stone-400 mt-0.5">
             सभी आंकड़े वास्तविक डेटाबेस लेजर से वास्तविक समय (Real-time) में सिंक हैं।
           </p>
         </div>
 
-        {/* Quick action buttons */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Quick action buttons - responsive grid on phone, clean flex on tablet/desktop */}
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto shrink-0">
           <Link
             href="/admin/expenses?action=add"
-            className="festive-btn-gold text-xs px-4 py-2 flex items-center gap-1.5 font-bold"
+            className="col-span-2 sm:col-span-1 festive-btn-gold text-xs px-4 py-2.5 flex items-center justify-center gap-1.5 font-bold shadow active:scale-95 transition-all text-center"
           >
-            <PlusCircle className="w-3.5 h-3.5 text-maroon-950" />
+            <PlusCircle className="w-3.5 h-3.5 text-maroon-950 shrink-0" />
             <span>व्यय दर्ज करें</span>
           </Link>
           <Link
             href="/admin/donations"
-            className="bg-black/60 hover:bg-black/80 text-amber-300 border border-amber-600/40 px-3.5 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5"
+            className="bg-black/60 hover:bg-black/80 text-amber-300 border border-amber-600/40 px-3.5 py-2.5 rounded-xl sm:rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 text-center active:scale-95 transition-all"
           >
             <span>दान रसीद</span>
           </Link>
           <Link
             href="/admin/reports"
-            className="bg-maroon-900/60 hover:bg-maroon-800 text-stone-200 border border-amber-900 px-3.5 py-2 rounded-full text-xs font-semibold"
+            className="bg-maroon-900/60 hover:bg-maroon-800 text-stone-200 border border-amber-900 px-3.5 py-2.5 rounded-xl sm:rounded-full text-xs font-semibold text-center active:scale-95 transition-all"
           >
             <span>वार्षिक रिपोर्ट</span>
           </Link>

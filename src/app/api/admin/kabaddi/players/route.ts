@@ -110,13 +110,20 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    if (!player.team) {
+      const foundTeam = await prisma.kabaddiTeam.findUnique({ where: { id: validated.teamId } });
+      player.team = foundTeam || { teamName: 'टीम' };
+    }
+
+    const teamTitle = player?.team?.teamName || 'टीम';
+
     await createAuditLog({
       userId: user.id,
       userName: user.name,
       action: validated.id ? 'UPDATE_KABADDI_PLAYER' : 'CREATE_KABADDI_PLAYER',
       module: 'KABADDI',
       recordId: player.id,
-      details: `${user.name} saved player: "${player.name}" (#${player.jerseyNumber || 'N/A'}) for team "${player.team.teamName}"`,
+      details: `${user.name} saved player: "${player.name}" (#${player.jerseyNumber || 'N/A'}) for team "${teamTitle}"`,
     });
 
     return NextResponse.json({ success: true, player });
@@ -150,13 +157,15 @@ export async function DELETE(req: NextRequest) {
 
     await prisma.kabaddiPlayer.delete({ where: { id } });
 
+    const teamTitle = player?.team?.teamName || 'टीम';
+
     await createAuditLog({
       userId: user.id,
       userName: user.name,
       action: 'DELETE_KABADDI_PLAYER',
       module: 'KABADDI',
       recordId: id,
-      details: `${user.name} deleted player "${player.name}" from team "${player.team.teamName}"`,
+      details: `${user.name} deleted player "${player.name}" from team "${teamTitle}"`,
     });
 
     return NextResponse.json({ success: true, message: 'खिलाड़ी सफलतापूर्वक हटा दिया गया' });

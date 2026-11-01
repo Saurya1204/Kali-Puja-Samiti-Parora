@@ -49,6 +49,18 @@ export default function AdminSidebar({
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
+  // Listen to mobile menu open event from header
+  React.useEffect(() => {
+    const handleOpen = () => setIsMobileOpen(true);
+    window.addEventListener('open-admin-menu', handleOpen);
+    return () => window.removeEventListener('open-admin-menu', handleOpen);
+  }, []);
+
+  // Auto-close on page navigation
+  React.useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
+
   const allNavItems: NavItem[] = [
     {
       href: '/admin',

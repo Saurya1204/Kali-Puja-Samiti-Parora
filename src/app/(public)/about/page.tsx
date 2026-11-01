@@ -53,8 +53,6 @@ export default async function AboutPage() {
     console.error('Error fetching about page data:', err);
   }
 
-  const isAdmin = user && ['SUPER_ADMIN', 'PRESIDENT', 'SECRETARY'].includes(user.role);
-
   // Map CMS sections by key
   const sectionMap = new Map(cmsSections.map((s) => [s.sectionKey, s]));
   const dynamicHistory = sectionMap.get('ABOUT_HISTORY');
@@ -72,7 +70,7 @@ export default async function AboutPage() {
   const faqs = [
     {
       q: 'काली पूजा महोत्सव का मुख्य मंदिर एवं सटीक स्थान क्या है?',
-      a: 'माँ काली का पावन मंदिर ऐतिहासिक "माँ चंडिका स्थान", ग्राम - परोरा, प्रखंड व जिला - बेगूसराय (बिहार - 851217) में अवस्थित है। यह बेगूसराय जिला मुख्यालय से मात्र 12 किमी की दूरी पर NH-31 के समीप स्थित है।',
+      a: 'माँ काली का पावन मंदिर ऐतिहासिक "माँ चंडिका स्थान", ग्राम - परोरा, प्रखंड व जिला - बेगूसराय (बिहार - 851217) में अवस्थित है। यह बेगूसराय जिला मुख्यालय से लगभग 28 किमी की दूरी पर NH-31 के समीप स्थित है।',
     },
     {
       q: 'काली पूजा महोत्सव 2026 की मुख्य तिथियां क्या हैं?',
@@ -138,40 +136,6 @@ export default async function AboutPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12 sm:space-y-16">
-      {/* ADMIN CMS DIRECT CONTROL BANNER */}
-      {isAdmin && (
-        <div className="bg-gradient-to-r from-amber-950 via-maroon-950 to-black border-2 border-amber-500/70 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 shadow-glow-gold">
-          <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-amber-500 text-maroon-950 flex items-center justify-center font-bold text-lg shadow shrink-0">
-              ⚙️
-            </span>
-            <div>
-              <span className="text-[10px] font-mono text-amber-400 font-extrabold uppercase tracking-wider block">
-                ADMINISTRATION PANEL (प्रबंधन नियंत्रण)
-              </span>
-              <h4 className="text-sm sm:text-base font-bold text-stone-100">
-                आप About Us पेज की सामग्री, इतिहास, चित्र एवं समिति सदस्य सीधे अपडेट या डिलीट कर सकते हैं।
-              </h4>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Link
-              href="/admin/cms"
-              className="festive-btn-gold text-xs px-3.5 py-2 flex items-center gap-1.5 font-bold shadow"
-            >
-              <Edit3 className="w-3.5 h-3.5 text-maroon-950" />
-              <span>पेज सामग्री व चित्र बदलें</span>
-            </Link>
-            <Link
-              href="/admin/committee"
-              className="bg-black/60 hover:bg-black/80 text-amber-300 border border-amber-500/50 text-xs px-3.5 py-2 rounded-full font-bold transition-all"
-            >
-              <span>सदस्य सूची बदलें</span>
-            </Link>
-          </div>
-        </div>
-      )}
-
       {/* HEADER SECTION */}
       <div className="text-center max-w-4xl mx-auto space-y-4">
         <div className="inline-flex items-center gap-2">
@@ -224,7 +188,7 @@ export default async function AboutPage() {
               </div>
               <div className="bg-black/60 border border-amber-900/60 p-3 rounded-xl">
                 <span className="text-amber-400 font-bold block mb-0.5">🚂 निकटतम स्टेशन:</span>
-                <span className="text-stone-300">बेगूसराय (12 किमी), बरौनी (18 किमी), तिलरथ (9 किमी)</span>
+                <span className="text-stone-300">बेगूसराय जंक्शन (लगभग 28 किमी), बरौनी जंक्शन (लगभग 32 किमी)</span>
               </div>
               <div className="bg-black/60 border border-amber-900/60 p-3 rounded-xl">
                 <span className="text-amber-400 font-bold block mb-0.5">🛣️ सड़क संपर्क:</span>

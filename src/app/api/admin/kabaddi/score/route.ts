@@ -59,13 +59,16 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const teamAName = match?.teamA?.teamName || 'टीम A';
+    const teamBName = match?.teamB?.teamName || 'टीम B';
+
     await createAuditLog({
       userId: user.id,
       userName: user.name,
       action: 'UPDATE_KABADDI_SCORE',
       module: 'KABADDI',
       recordId: match.id,
-      details: `${user.name} updated score for Match #${match.matchNumber}: ${match.teamA.teamName} (${match.teamAScore}) vs ${match.teamB.teamName} (${match.teamBScore})`,
+      details: `${user.name} updated score for Match #${match.matchNumber}: ${teamAName} (${match.teamAScore}) vs ${teamBName} (${match.teamBScore})`,
     });
 
     return NextResponse.json({ success: true, match });

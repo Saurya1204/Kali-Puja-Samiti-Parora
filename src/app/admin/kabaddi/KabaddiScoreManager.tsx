@@ -109,6 +109,67 @@ export default function KabaddiScoreManager({
     superTackles: 1,
   });
 
+  // Photo upload state & helper
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, isTeamLogo = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('कृपया केवल इमेज (JPG, PNG, WebP) फाइल चुनें।');
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 700;
+        const MAX_HEIGHT = 700;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          if (isTeamLogo) {
+            setTeamForm((prev: any) => ({ ...prev, logoUrl: dataUrl }));
+          } else {
+            setPlayerForm((prev) => ({ ...prev, photoUrl: dataUrl }));
+          }
+        }
+        setIsUploadingPhoto(false);
+      };
+      img.onerror = () => {
+        setIsUploadingPhoto(false);
+        alert('इमेज प्रोसेस करने में त्रुटि');
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = () => {
+      setIsUploadingPhoto(false);
+      alert('फाइल पढ़ने में त्रुटि');
+    };
+    reader.readAsDataURL(file);
+  };
+
   // Match Modal
   const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
   const [editingMatch, setEditingMatch] = useState<Match | null>(null);
@@ -1121,14 +1182,64 @@ export default function KabaddiScoreManager({
               </div>
 
               <div>
-                <label className="block text-stone-300 font-semibold mb-1">फोटो URL (Picture URL)</label>
-                <input
-                  type="url"
-                  value={playerForm.photoUrl}
-                  onChange={(e) => setPlayerForm({ ...playerForm, photoUrl: e.target.value })}
-                  placeholder="https://images.unsplash.com/... अथवा इमेज लिंक"
-                  className="w-full px-3 py-2 bg-black/50 border border-amber-900/50 rounded-xl text-stone-200"
-                />
+                <label className="block text-stone-300 font-semibold mb-1">
+                  खिलाड़ी की फोटो (Player Photo)
+                </label>
+
+                {/* Upload or Preview Box */}
+                <div className="p-3 rounded-2xl bg-black/60 border border-amber-900/60 space-y-2.5">
+                  <div className="flex items-center gap-3">
+                    {/* Live Preview Box */}
+                    <div className="w-16 h-16 rounded-xl bg-maroon-900/80 border-2 border-amber-500/50 overflow-hidden flex items-center justify-center shrink-0 shadow">
+                      {playerForm.photoUrl ? (
+                        <img
+                          src={playerForm.photoUrl}
+                          alt="खिलाड़ी फोटो"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-amber-400 font-mono text-[10px] text-center px-1">फोटो नहीं</span>
+                      )}
+                    </div>
+
+                    <div className="flex-1 space-y-1.5 min-w-0">
+                      <label className="cursor-pointer inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-maroon-950 font-bold px-3 py-1.5 rounded-xl text-xs shadow transition-all active:scale-95">
+                        <span>📷 गैलरी / कैमरे से फोटो अपलोड करें</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handlePhotoUpload(e, false)}
+                        />
+                      </label>
+                      <p className="text-[10px] text-stone-400">
+                        {isUploadingPhoto
+                          ? 'फोटो प्रोसेस हो रही है...'
+                          : 'मोबाइल गैलरी से फोटो चुनें या सीधे कैमरे से फोटो खींचें'}
+                      </p>
+                      {playerForm.photoUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setPlayerForm({ ...playerForm, photoUrl: '' })}
+                          className="text-[10px] text-red-400 hover:text-red-300 underline block"
+                        >
+                          फोटो हटाएं (Remove Photo)
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Or External URL input */}
+                  <div className="pt-1.5 border-t border-stone-800">
+                    <input
+                      type="url"
+                      value={playerForm.photoUrl}
+                      onChange={(e) => setPlayerForm({ ...playerForm, photoUrl: e.target.value })}
+                      placeholder="अथवा वेब इमेज लिंक (URL) दर्ज करें"
+                      className="w-full px-2.5 py-1.5 bg-stone-900/80 border border-stone-800 rounded-lg text-stone-300 text-xs"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -1246,14 +1357,14 @@ export default function KabaddiScoreManager({
                 <button
                   type="button"
                   onClick={() => setIsPlayerModalOpen(false)}
-                  className="px-4 py-2 bg-black/50 text-stone-300 rounded-xl"
+                  className="flex-1 sm:flex-initial px-4 py-2.5 bg-black/60 hover:bg-black/80 text-stone-300 rounded-xl text-xs font-semibold"
                 >
                   रद्द करें
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="festive-btn-gold px-5 py-2"
+                  className="flex-1 sm:flex-initial festive-btn-gold px-5 py-2.5 text-xs font-bold"
                 >
                   {loading ? 'सहेज रहे हैं...' : editingPlayer ? 'अपडेट सुरक्षित करें' : 'खिलाड़ी जोड़ें'}
                 </button>
@@ -1331,6 +1442,30 @@ export default function KabaddiScoreManager({
                   placeholder="उदा. श्री अमरनाथ प्रसाद (चीफ कोच)"
                   className="w-full px-3 py-2 bg-black/50 border border-amber-900/50 rounded-xl text-stone-200"
                 />
+              </div>
+
+              <div>
+                <label className="block text-stone-300 font-semibold mb-1">टीम लोगो / ध्वज (Team Logo)</label>
+                <div className="flex items-center gap-3 p-2.5 bg-black/50 border border-amber-900/50 rounded-xl">
+                  <div className="w-12 h-12 rounded-xl bg-maroon-900 border border-amber-500/40 overflow-hidden flex items-center justify-center shrink-0">
+                    {(teamForm as any).logoUrl ? (
+                      <img src={(teamForm as any).logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[10px] text-amber-400 font-mono">लोगो</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="cursor-pointer inline-flex items-center gap-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded-lg text-xs font-semibold">
+                      <span>📁 लोगो अपलोड करें</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handlePhotoUpload(e, true)}
+                      />
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-amber-900/40">

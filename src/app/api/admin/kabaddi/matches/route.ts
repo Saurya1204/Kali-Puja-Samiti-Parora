@@ -108,13 +108,16 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const nameA = match?.teamA?.teamName || 'टीम A';
+    const nameB = match?.teamB?.teamName || 'टीम B';
+
     await createAuditLog({
       userId: user.id,
       userName: user.name,
       action: validated.id ? 'UPDATE_KABADDI_MATCH' : 'CREATE_KABADDI_MATCH',
       module: 'KABADDI',
       recordId: match.id,
-      details: `${user.name} saved match #${match.matchNumber}: ${match.teamA.teamName} vs ${match.teamB.teamName}`,
+      details: `${user.name} saved match #${match.matchNumber}: ${nameA} vs ${nameB}`,
     });
 
     return NextResponse.json({ success: true, match });
@@ -148,13 +151,16 @@ export async function DELETE(req: NextRequest) {
 
     await prisma.kabaddiMatch.delete({ where: { id } });
 
+    const nameA = match?.teamA?.teamName || 'टीम A';
+    const nameB = match?.teamB?.teamName || 'टीम B';
+
     await createAuditLog({
       userId: user.id,
       userName: user.name,
       action: 'DELETE_KABADDI_MATCH',
       module: 'KABADDI',
       recordId: id,
-      details: `${user.name} deleted match #${match.matchNumber}: ${match.teamA.teamName} vs ${match.teamB.teamName}`,
+      details: `${user.name} deleted match #${match.matchNumber}: ${nameA} vs ${nameB}`,
     });
 
     return NextResponse.json({ success: true, message: 'मैच सफलतापूर्वक हटा दिया गया' });
