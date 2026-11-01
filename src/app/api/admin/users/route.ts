@@ -9,17 +9,7 @@ const UserCreateSchema = z.object({
   name: z.string().min(2, 'नाम आवश्यक है'),
   email: z.string().email('मान्य ईमेल आवश्यक है'),
   password: z.string().min(6, 'पासवर्ड न्यूनतम 6 वर्णों का होना चाहिए').optional(),
-  role: z.enum([
-    'SUPER_ADMIN',
-    'PRESIDENT',
-    'SECRETARY',
-    'TREASURER',
-    'FINANCE_ADMIN',
-    'KABADDI_ADMIN',
-    'AWARDS_ADMIN',
-    'EVENT_MANAGER',
-    'VOLUNTEER',
-  ]),
+  role: z.string().min(1, 'रोल का चयन आवश्यक है'),
   phone: z.string().optional().nullable(),
   isActive: z.boolean().default(true),
 });

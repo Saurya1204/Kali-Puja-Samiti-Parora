@@ -500,8 +500,12 @@ export default async function AboutPage() {
             >
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 text-maroon-950 font-bold flex items-center justify-center text-lg shadow-md shrink-0">
-                    {m.name.charAt(0)}
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 text-maroon-950 font-bold flex items-center justify-center text-lg shadow-md shrink-0 overflow-hidden border border-amber-400/40">
+                    {m.photoUrl ? (
+                      <img src={m.photoUrl} alt={m.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{m.name.charAt(0)}</span>
+                    )}
                   </div>
                   <div>
                     <h4 className="font-bold text-stone-100 text-base">{m.nameHindi || m.name}</h4>

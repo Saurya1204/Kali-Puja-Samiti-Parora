@@ -48,6 +48,19 @@ export default function AdminSidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [dynamicRoles, setDynamicRoles] = useState<any[] | null>(null);
+
+  // Fetch dynamic role visibility rules
+  React.useEffect(() => {
+    fetch('/api/admin/roles')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.roles) {
+          setDynamicRoles(data.roles);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Listen to mobile menu open event from header
   React.useEffect(() => {
@@ -178,9 +191,21 @@ export default function AdminSidebar({
     },
   ];
 
-  const filteredNavItems = allNavItems.filter((item) =>
-    item.allowedRoles.includes(userRole)
-  );
+  const filteredNavItems = allNavItems.filter((item) => {
+    // Super Admin always sees every section
+    if (userRole === 'SUPER_ADMIN') return true;
+
+    // If dynamic role permissions are loaded from DB, respect Super Admin's configuration
+    if (dynamicRoles && Array.isArray(dynamicRoles)) {
+      const roleConfig = dynamicRoles.find((r) => r.key === userRole);
+      if (roleConfig && Array.isArray(roleConfig.visibleModules)) {
+        return roleConfig.visibleModules.includes(item.href);
+      }
+    }
+
+    // Default static fallback
+    return item.allowedRoles.includes(userRole);
+  });
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
