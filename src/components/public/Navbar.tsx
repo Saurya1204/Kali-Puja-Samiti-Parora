@@ -50,21 +50,21 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Primary links visible on desktop
+  // Primary links visible on desktop (Maa Kali Festival, About Us, Events, Achievers, Gallery)
   const primaryLinks: NavLinkItem[] = [
     { href: '/', labelEn: 'Home', labelHi: 'मुख्य पृष्ठ', icon: Sparkles },
-    { href: '/kabaddi', labelEn: 'Kabaddi', labelHi: 'कबड्डी महाकुंभ', icon: Trophy, highlight: true },
-    { href: '/events', labelEn: 'Events', labelHi: 'कार्यक्रम', icon: Calendar },
+    { href: '/about', labelEn: 'About Us', labelHi: 'समिति व इतिहास', icon: Info },
+    { href: '/events', labelEn: 'Events', labelHi: 'महोत्सव कार्यक्रम', icon: Calendar },
     { href: '/achievers', labelEn: 'Achievers', labelHi: 'मेधावी छात्र', icon: GraduationCap },
-    { href: '/gallery', labelEn: 'Gallery', labelHi: 'गैलरी', icon: ImageIcon },
+    { href: '/gallery', labelEn: 'Gallery', labelHi: 'दर्शन गैलरी', icon: ImageIcon },
   ];
 
   // Secondary links in "More" dropdown
   const moreLinks: NavLinkItem[] = [
-    { href: '/register', labelEn: 'Registration', labelHi: 'ऑनलाइन पंजीकरण', icon: FileText },
+    { href: '/kabaddi', labelEn: 'Kabaddi Tournament', labelHi: 'कबड्डी प्रतियोगिता (9-10 Nov)', icon: Trophy },
     { href: '/donations', labelEn: 'Donations', labelHi: 'सहयोग व दान', icon: Heart },
+    { href: '/register', labelEn: 'Registration', labelHi: 'ऑनलाइन पंजीकरण', icon: FileText },
     { href: '/notices', labelEn: 'Notices', labelHi: 'सूचनाएं व विज्ञप्ति', icon: FileText },
-    { href: '/about', labelEn: 'About Samiti', labelHi: 'समिति परिचय व इतिहास', icon: Info },
     { href: '/quiz', labelEn: 'Festival Quiz', labelHi: 'काली पूजा प्रश्नोत्तरी', icon: HelpCircle },
     { href: '/vote', labelEn: 'People Choice Vote', labelHi: 'जनता की पसंद वोट', icon: Vote },
   ];
@@ -218,14 +218,14 @@ export default function Navbar() {
 
       {/* Mobile Drawer Menu - Clean, fully aligned, spacious */}
       {isOpen && (
-        <div className="lg:hidden bg-gradient-to-b from-[#190404] via-maroon-950 to-black border-b border-amber-500/40 px-4 pt-3 pb-6 space-y-4 shadow-2xl animate-in slide-in-from-top-4 duration-200 max-h-[85vh] overflow-y-auto">
+        <div className="xl:hidden bg-gradient-to-b from-[#190404] via-maroon-950 to-black border-b border-amber-500/40 px-4 pt-3 pb-6 space-y-4 shadow-2xl animate-in slide-in-from-top-4 duration-200 max-h-[85vh] overflow-y-auto">
           {/* Address & Helpline Pill */}
           <div className="p-3 rounded-xl bg-black/60 border border-amber-500/30 flex items-center justify-between text-xs">
             <div>
               <span className="text-[10px] text-amber-400 font-bold block uppercase tracking-wider">
-                स्थान व पिन कोड
+                पावन धाम व पिन कोड
               </span>
-              <span className="text-stone-200 font-medium">परौरा, बेगूसराय, बिहार - 851217</span>
+              <span className="text-stone-200 font-medium">माँ चंडिका स्थान, परोरा, बेगूसराय - 851217</span>
             </div>
             <a
               href="tel:6203510983"

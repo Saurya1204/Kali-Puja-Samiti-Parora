@@ -6,6 +6,10 @@ const nextConfig = {
       { protocol: 'https', hostname: '**' },
       { protocol: 'http', hostname: '**' }
     ]
+  },
+  webpack: (config) => {
+    config.cache = false;
+    return config;
   }
 };
 

@@ -118,13 +118,28 @@ export async function DELETE(req: NextRequest) {
     const user = await getSessionUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    if (user.role !== ROLES.SUPER_ADMIN) {
-      return NextResponse.json({ error: 'केवल सुपर एडमिन ही बैनर हटा सकते हैं' }, { status: 403 });
+    if (user.role !== ROLES.SUPER_ADMIN && user.role !== ROLES.PRESIDENT) {
+      return NextResponse.json({ error: 'केवल अधिकृत एडमिन ही CMS सामग्री हटा सकते हैं' }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
-    if (!id) return NextResponse.json({ error: 'बैनर ID आवश्यक है' }, { status: 400 });
+    const sectionKey = searchParams.get('sectionKey');
+
+    // Handle section deletion
+    if (sectionKey) {
+      await prisma.cmsContentSection.deleteMany({ where: { sectionKey } });
+      await createAuditLog({
+        userId: user.id,
+        userName: user.name,
+        action: 'DELETE_CMS_SECTION',
+        module: 'CMS',
+        details: `${user.name} deleted CMS section: "${sectionKey}"`,
+      });
+      return NextResponse.json({ success: true, message: 'सेक्शन सफलतापूर्वक हटा दिया गया' });
+    }
+
+    if (!id) return NextResponse.json({ error: 'पहचान (ID या sectionKey) आवश्यक है' }, { status: 400 });
 
     const banner = await prisma.cmsBanner.findUnique({ where: { id } });
     if (!banner) return NextResponse.json({ error: 'बैनर नहीं मिला' }, { status: 404 });

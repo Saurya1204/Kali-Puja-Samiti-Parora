@@ -22,8 +22,8 @@ export default function Footer() {
             <SamitiLogo size="lg" />
             <p className="text-xs sm:text-sm text-stone-400 leading-relaxed">
               {t(
-                'Parora is the heart of Bihar Kabaddi and Maa Kali devotional fervor. Organizing state-level championships, spiritual ceremonies, and student felicitation since 1984.',
-                'परौरा - माँ काली की अगाध भक्ति एवं बिहार कबड्डी का गौरवशाली तीर्थ। वर्ष 1984 से राज्यस्तरीय खेल महाकुंभ, भक्ति जागरण एवं प्रतिभा सम्मान का भव्य आयोजन।'
+                'Maa Chandika Asthan, Parora (Begusarai, Bihar - 851217) — Sacred shrine of Maa Kali. Celebrating over 40 years of continuous devotion, nocturnal Nisha Puja, Maha Aarti, community harmony, state-level sports events, and student felicitation since 1984.',
+                'माँ चंडिका स्थान, परोरा (बेगूसराय, बिहार - 851217) – माँ काली का ऐतिहासिक पावन प्रांगण। वर्ष 1984 से अविरल भक्ति, भव्य निशा पूजा, महाआरती, सामाजिक समरसता, वार्षिक खेलकूद (कबड्डी) एवं मेधावी छात्र सम्मान का चार दशकों से अनवरत संगम।'
               )}
             </p>
             <div className="pt-2">
@@ -88,14 +88,14 @@ export default function Footer() {
                 <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-amber-200 block">{t('Venue:', 'आयोजन स्थल:')}</strong>
-                  <span>माँ काली मंदिर प्रांगण एवं खेल मैदान, परोरा, बेगूसराय, बिहार - 851217</span>
+                  <span>माँ चंडिका स्थान, परोरा, बेगूसराय, बिहार - 851217</span>
                 </div>
               </li>
               <li className="flex items-start gap-2.5">
                 <Trophy className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-amber-200 block">{t('Kabaddi Arena:', 'कबड्डी महासंग्राम:')}</strong>
-                  <span>फ्लडलाइट्स युक्त आधुनिक मैट कोर्ट, उच्च विद्यालय परोरा</span>
+                  <strong className="text-amber-200 block">{t('Kabaddi Arena (Event):', 'वार्षिक खेल आयोजन (कबड्डी):')}</strong>
+                  <span>9 व 10 नवंबर • उच्च विद्यालय खेल मैदान, परोरा (851217)</span>
                 </div>
               </li>
             </ul>
@@ -104,13 +104,25 @@ export default function Footer() {
           {/* Col 4: Quick Links & UPI */}
           <div>
             <h4 className="text-sm font-bold uppercase tracking-wider text-amber-400 mb-4 border-b border-amber-900/60 pb-2">
-              {t('Quick Links & Seva', 'त्वरित लिंक्स व दान')}
+              {t('Quick Links & Seva', 'त्वरित लिंक्स व दर्शन')}
             </h4>
             <ul className="space-y-2 text-xs sm:text-sm">
               <li>
-                <Link href="/kabaddi" className="hover:text-amber-300 transition-colors flex items-center gap-1.5 font-semibold text-amber-200">
-                  <span>🏆</span>
-                  <span>कबड्डी टूर्नामेंट व खिलाड़ी प्रोफाइल</span>
+                <Link href="/about" className="hover:text-amber-300 transition-colors flex items-center gap-1.5 font-semibold text-amber-200">
+                  <span>🏛️</span>
+                  <span>समिति परिचय व चंडिका स्थान इतिहास</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/events" className="hover:text-amber-300 transition-colors flex items-center gap-1.5">
+                  <span>📅</span>
+                  <span>काली पूजा महोत्सव कार्यक्रम व अनुष्ठान</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/gallery" className="hover:text-amber-300 transition-colors flex items-center gap-1.5">
+                  <span>🖼️</span>
+                  <span>माँ काली दिव्य दर्शन व फोटो गैलरी</span>
                 </Link>
               </li>
               <li>
@@ -120,9 +132,9 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/events" className="hover:text-amber-300 transition-colors flex items-center gap-1.5">
-                  <span>📅</span>
-                  <span>महोत्सव समय-सारणी व कार्यक्रम</span>
+                <Link href="/kabaddi" className="hover:text-amber-300 transition-colors flex items-center gap-1.5">
+                  <span>🏆</span>
+                  <span>कबड्डी प्रतियोगिता (9 व 10 नवंबर)</span>
                 </Link>
               </li>
               <li>

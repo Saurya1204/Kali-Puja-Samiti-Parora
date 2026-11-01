@@ -72,27 +72,61 @@ export default function KabaddiArenaClient({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
-      {/* Hero Section */}
-      <div className="text-center max-w-4xl mx-auto space-y-4">
-        <div className="inline-flex items-center gap-2">
-          <DiyaAnimation size="sm" />
-          <span className="text-xs uppercase font-extrabold tracking-widest text-amber-400 bg-black/40 px-3 py-1 rounded-full border border-amber-500/30">
-            All-Bihar State Level Kabaddi Championship
-          </span>
-          <DiyaAnimation size="sm" />
+      {/* OFFICIAL TOURNAMENT BANNER CARD (9 & 10 NOV 2026) */}
+      <div className="max-w-5xl mx-auto rounded-3xl overflow-hidden border-2 border-amber-500/70 shadow-[0_0_35px_rgba(245,158,11,0.25)] bg-gradient-to-br from-black via-maroon-950 to-[#190404] p-6 sm:p-10 relative">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-amber-900/60 pb-6 relative z-10">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-3 py-1 rounded-full bg-red-600 text-white font-mono text-[11px] font-black uppercase tracking-wider shadow animate-pulse">
+                🔴 आधिकारिक टूर्नामेंट
+              </span>
+              <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-bold">
+                श्री श्री 108 काली पूजा महोत्सव 2026
+              </span>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-amber-100 font-serif leading-tight">
+              अखिल बिहार राज्य स्तरीय आमंत्रण कबड्डी प्रतियोगिता 2026
+            </h1>
+
+            <p className="text-xs sm:text-sm text-stone-300">
+              काली पूजा महोत्सव के अंतर्गत आयोजित पारंपरिक खेल आयोजन • प्रो मैट व डे-नाईट फ्लडलाइट्स कोर्ट
+            </p>
+          </div>
+
+          <div className="bg-black/70 border border-amber-500/50 p-4 rounded-2xl text-left md:text-right shrink-0 shadow-lg">
+            <span className="text-[10px] uppercase font-mono font-bold text-amber-400 block tracking-wide">
+              टूर्नामेंट दिनांक (Event Dates)
+            </span>
+            <span className="text-xl sm:text-2xl font-black text-amber-300 font-mono block mt-0.5">
+              9 एवं 10 नवंबर 2026
+            </span>
+            <span className="text-[11px] text-stone-300 block">
+              कार्तिक अमावस्या - प्रतिपदा (दीपावली पश्चात)
+            </span>
+          </div>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-black text-amber-200 font-serif leading-tight">
-          अखिल बिहार राज्यस्तरीय कबड्डी महाकुंभ {festivalYear}
-        </h1>
-
-        <p className="text-sm sm:text-base text-stone-300 leading-relaxed max-w-3xl mx-auto">
-          परौरा की पावन धरा - जो बिहार कबड्डी का गौरवशाली तीर्थ है। 16 शीर्ष आमंत्रित टीमों के मध्य मैट पर खिताबी भिड़ंत।
-          खिलाड़ियों के नाम पर क्लिक कर उनका पूरा प्रोफाइल, कौशल एवं उपलब्धियां देखें।
-        </p>
+        {/* Tournament Highlights Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-6 text-xs relative z-10">
+          <div className="p-3.5 bg-black/60 rounded-2xl border border-amber-900/60">
+            <span className="text-amber-400 font-bold block mb-1">📍 आयोजन स्थल (Venue):</span>
+            <span className="text-stone-200 font-medium">उच्च विद्यालय खेल मैदान, परोरा, बेगूसराय (851217)</span>
+          </div>
+          <div className="p-3.5 bg-black/60 rounded-2xl border border-amber-900/60">
+            <span className="text-amber-400 font-bold block mb-1">👥 मुख्य संरक्षक व मार्गदर्शक:</span>
+            <span className="text-stone-200 font-medium">श्री अमरनाथ प्रसाद (फोन: 6203510983)</span>
+          </div>
+          <div className="p-3.5 bg-black/60 rounded-2xl border border-amber-900/60">
+            <span className="text-amber-400 font-bold block mb-1">🏛️ आयोजक संस्था:</span>
+            <span className="text-stone-200 font-medium">श्री श्री 108 काली पूजा समिति परोरा</span>
+          </div>
+        </div>
 
         {/* Prize Pool Highlights */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2 max-w-2xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-4 max-w-2xl mx-auto relative z-10">
           <div className="bg-gradient-to-b from-amber-500/25 to-maroon-950/80 border border-amber-500/50 rounded-2xl p-4 text-center shadow-lg">
             <Trophy className="w-6 h-6 text-amber-400 mx-auto mb-1" />
             <div className="text-xs text-amber-200 font-bold uppercase">विजेता (Champion)</div>
@@ -112,13 +146,19 @@ export default function KabaddiArenaClient({
           </div>
         </div>
 
-        <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+        <div className="pt-6 flex flex-wrap items-center justify-center gap-3 relative z-10">
           <Link
             href="/register?type=KABADDI"
             className="festive-btn-gold text-xs sm:text-sm px-6 py-2.5 inline-flex items-center gap-2 font-bold shadow-lg"
           >
             <Users className="w-4 h-4" />
             <span>टीम का ऑनलाइन पंजीकरण करें (Team Registration)</span>
+          </Link>
+          <Link
+            href="/about"
+            className="bg-black/60 hover:bg-black/80 text-amber-300 border border-amber-500/40 text-xs sm:text-sm px-5 py-2.5 rounded-full font-bold"
+          >
+            <span>काली पूजा महोत्सव व समिति परिचय</span>
           </Link>
         </div>
       </div>
@@ -136,7 +176,7 @@ export default function KabaddiArenaClient({
 
           <div className="space-y-2 text-center md:text-left flex-1">
             <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider">
-              <span>★ भीष्म पितामह • बिहार कबड्डी व खेल संरक्षक</span>
+              <span>★ मुख्य संरक्षक व मार्गदर्शक • खेल एवं युवा संवर्धन</span>
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-black text-amber-200 font-serif">

@@ -263,7 +263,7 @@ export default function PlayerProfileModal({
                 गुरु-शिष्य परंपरा • Parora Akhada Mentorship
               </span>
               <p className="text-[11px] text-stone-200 leading-snug">
-                बिहार कबड्डी के भीष्म पितामह <strong>श्री अमरनाथ प्रसाद (Amarnath Prasad)</strong> के मार्गदर्शन में प्रशिक्षित।
+                समिति के मुख्य संरक्षक <strong>श्री अमरनाथ प्रसाद (Amarnath Prasad)</strong> के मार्गदर्शन में प्रशिक्षित।
               </p>
             </div>
           </div>

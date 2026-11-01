@@ -111,23 +111,15 @@ export default function SamitiLogo({
         </div>
 
         {showSubtitle && (
-          <div className="flex items-center gap-1.5 mt-0.5 whitespace-nowrap">
-            {/* Mobile View (< sm): Compact and explicitly showing Parora, Begusarai and PIN 851217 */}
-            <span className="sm:hidden text-[10px] text-amber-300/90 font-medium whitespace-nowrap">
-              परोरा, बेगूसराय (पिन: 851217)
+          <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1.5 mt-0.5">
+            <span
+              className={`${subStyles} text-amber-300/85 font-mono tracking-wider uppercase font-semibold whitespace-nowrap`}
+            >
+              Kali Puja Samiti Parora
             </span>
-
-            {/* Tablet & Desktop View (>= sm): Full brand name and Parora, Begusarai (851217) */}
-            <div className="hidden sm:flex items-center gap-1.5 whitespace-nowrap">
-              <span
-                className={`${subStyles} text-amber-300/85 font-mono tracking-wider uppercase font-semibold whitespace-nowrap`}
-              >
-                Kali Puja Samiti Parora
-              </span>
-              <span className="inline-block w-1 h-1 rounded-full bg-amber-500 shrink-0" />
-              <span className="text-[10px] sm:text-[11px] text-amber-200/80 font-medium whitespace-nowrap">
-                परोरा, बेगूसराय (851217)
-              </span>
+            <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-amber-200/80 font-medium whitespace-nowrap">
+              <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-amber-500 shrink-0" />
+              <span>परोरा, बेगूसराय (पिन: 851217)</span>
             </div>
           </div>
         )}

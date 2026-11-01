@@ -107,28 +107,38 @@ export default async function HomePage() {
     console.error('Database connection or query error on HomePage:', dbError);
   }
 
-  // Graceful fallback banners if CMS banners are empty or DB is initializing
+  // Graceful fallback banners prioritizing Maa Kali Darshan & Chandika Asthan
   if (cmsBanners.length === 0) {
     cmsBanners = [
       {
         id: 'fallback-kali-darshan',
         title: 'श्री श्री 108 माँ काली दिव्य दर्शन – परोरा',
-        subtitle: 'परौरा, बेगूसराय (बिहार - 851217) – पावन वार्षिक काली पूजा महोत्सव 2026',
+        subtitle: 'माँ चंडिका स्थान, परोरा, बेगूसराय (बिहार - 851217) – पावन वार्षिक काली पूजा महोत्सव 2026',
         badgeText: '🔴 दिव्य पावन दर्शन',
         imageUrl: 'https://images.unsplash.com/photo-1605647540924-852290f6b0d5?auto=format&fit=crop&w=1600&q=80',
-        buttonText: 'कार्यक्रम विवरण',
-        linkUrl: '/events',
+        buttonText: 'मंदिर व पूजा दर्शन',
+        linkUrl: '/about',
         sortOrder: 1,
       },
       {
+        id: 'fallback-chandika-asthan',
+        title: 'माँ चंडिका स्थान परोरा – चार दशकों की दिव्य आस्था',
+        subtitle: 'स्थापना 1984 • तांत्रोक्त निशा पूजा, 108 दीप महाआरती, सामाजिक समरसता व मेधावी छात्र सम्मान',
+        badgeText: '🏛️ सिद्ध पीठ चंडिका स्थान',
+        imageUrl: 'https://images.unsplash.com/photo-1567591414240-e17f09325965?auto=format&fit=crop&w=1600&q=80',
+        buttonText: 'समिति परिचय व इतिहास',
+        linkUrl: '/about',
+        sortOrder: 2,
+      },
+      {
         id: 'fallback-kabaddi',
-        title: 'अखिल बिहार राज्य स्तरीय कबड्डी महासंग्राम',
-        subtitle: 'मुख्य संरक्षक व मार्गदर्शक: श्री अमरनाथ प्रसाद (6203510983) | अत्याधुनिक मैट व डे-नाईट फ्लडलाइट्स कोर्ट',
-        badgeText: 'कबड्डी - परोरा महोत्सव की धड़कन',
+        title: 'अखिल बिहार राज्य स्तरीय आमंत्रण कबड्डी प्रतियोगिता 2026',
+        subtitle: '9 एवं 10 नवंबर 2026 • उच्च विद्यालय खेल मैदान, परोरा | मुख्य संरक्षक: श्री अमरनाथ प्रसाद (6203510983)',
+        badgeText: '🏆 खेल आयोजन: 9-10 Nov',
         imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1600&q=80',
         buttonText: 'कबड्डी एरिना देखें',
         linkUrl: '/kabaddi',
-        sortOrder: 2,
+        sortOrder: 3,
       },
     ];
   }
@@ -287,14 +297,14 @@ export default async function HomePage() {
           </Link>
 
           <Link
-            href="/kabaddi"
+            href="/about"
             className="festive-card p-5 group flex flex-col items-center text-center hover:scale-[1.02] transition-transform"
           >
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center text-white shadow-md mb-3 group-hover:rotate-6 transition-transform">
-              <Trophy className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center text-white shadow-md mb-3 group-hover:rotate-6 transition-transform">
+              <Sparkles className="w-6 h-6" />
             </div>
-            <h4 className="font-bold text-amber-300 text-sm sm:text-base">Kabaddi Tournament</h4>
-            <p className="text-xs text-stone-400 mt-1">राज्यस्तरीय मैट प्रतियोगिता</p>
+            <h4 className="font-bold text-amber-300 text-sm sm:text-base">Maa Chandika Asthan</h4>
+            <p className="text-xs text-stone-400 mt-1">समिति परिचय व 40+ वर्ष इतिहास</p>
           </Link>
 
           <Link
@@ -321,38 +331,79 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* KABADDI – THE HEART OF PARORA FESTIVAL & LEADERSHIP */}
+      {/* ANNUAL FESTIVAL SPORTS EVENT: ALL-BIHAR KABADDI TOURNAMENT (9 & 10 NOV 2026) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-gradient-to-br from-[#1a0505] via-[#240808] to-maroon-950 border-2 border-amber-500/50 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
           {/* Decorative glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
 
+          {/* OFFICIAL TOURNAMENT BANNER STRIP */}
+          <div className="mb-8 p-5 sm:p-6 bg-gradient-to-r from-red-950/90 via-black to-maroon-900/90 border border-amber-500/50 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl relative z-10">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-red-600 flex items-center justify-center text-maroon-950 font-black text-2xl shadow shrink-0">
+                🏆
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black uppercase tracking-wider animate-pulse">
+                    आधिकारिक टूर्नामेंट
+                  </span>
+                  <span className="text-xs text-amber-300 font-mono font-bold bg-black/60 px-2.5 py-0.5 rounded-full border border-amber-500/30">
+                    📅 9 एवं 10 नवंबर 2026
+                  </span>
+                </div>
+                <h4 className="text-lg sm:text-2xl font-black text-amber-100 font-serif mt-1">
+                  अखिल बिहार राज्य स्तरीय आमंत्रण कबड्डी प्रतियोगिता 2026
+                </h4>
+                <p className="text-xs text-stone-300">
+                  श्री श्री 108 काली पूजा महोत्सव 2026 • उच्च विद्यालय खेल मैदान, परोरा (बेगूसराय - 851217)
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
+              <Link
+                href="/kabaddi"
+                className="festive-btn-gold text-xs px-5 py-2.5 flex items-center gap-1.5 font-bold shadow flex-1 sm:flex-none justify-center"
+              >
+                <span>कबड्डी एरिना व शेड्यूल</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                href="/register?type=KABADDI"
+                className="bg-black/60 hover:bg-black/80 text-amber-200 border border-amber-500/50 text-xs px-4 py-2.5 rounded-full font-bold flex-1 sm:flex-none text-center"
+              >
+                <span>टीम पंजीकरण</span>
+              </Link>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-            {/* Left Col: Kabaddi Heritage & Parora Legacy */}
+            {/* Left Col: Kabaddi Heritage as Festival Sports Event */}
             <div className="lg:col-span-7 space-y-4">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-600/20 text-red-300 border border-red-500/40 text-xs font-bold uppercase tracking-wider">
                 <Trophy className="w-4 h-4 text-amber-400" />
-                <span>{kabaddiSpotlight?.subtitle || 'अखिल बिहार प्रसिद्ध परोरा कबड्डी टीम का स्वर्णिम इतिहास'}</span>
+                <span>वार्षिक खेल आयोजन • 9 व 10 नवंबर 2026</span>
               </div>
 
               <h3 className="text-2xl sm:text-4xl font-extrabold text-amber-200 font-serif leading-tight">
-                {kabaddiSpotlight?.title || 'कबड्डी – परोरा महोत्सव की धड़कन'}
+                {kabaddiSpotlight?.title || 'काली पूजा महोत्सव का पारंपरिक खेल: राज्यस्तरीय कबड्डी प्रतियोगिता'}
               </h3>
 
               <p className="text-xs sm:text-sm text-stone-300 leading-relaxed">
                 {kabaddiSpotlight?.content ||
-                  'काली पूजा महोत्सव के साथ-साथ कबड्डी इस पूरे आयोजन का प्राण है। परोरा टीम पूरे बिहार में अपने आक्रामक खेल, अनुकरणीय अनुशासन और राष्ट्रीय स्तर की प्रतिभाओं के लिए जानी जाती है।'}
+                  'श्री श्री 108 काली पूजा महोत्सव, परोरा के उपलक्ष्य में प्रतिवर्ष राज्यस्तरीय कबड्डी प्रतियोगिता का भव्य आयोजन होता है। उच्च विद्यालय परोरा के मैदान पर अत्याधुनिक प्रो-मैट एवं फ्लडलाइट्स कोर्ट पर बिहार की शीर्ष 16 टीमें खिताबी भिड़ंत करती हैं।'}
               </p>
 
               {/* Quick Arena highlights */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
                 <div className="p-3 rounded-xl bg-black/60 border border-amber-600/30 text-center">
-                  <span className="text-xl sm:text-2xl font-black text-amber-300 font-mono block">8+</span>
-                  <span className="text-[11px] text-stone-400">शीर्ष राज्यस्तरीय टीमें</span>
+                  <span className="text-xl sm:text-2xl font-black text-amber-300 font-mono block">9-10 Nov</span>
+                  <span className="text-[11px] text-stone-400">टूर्नामेंट तिथियां</span>
                 </div>
                 <div className="p-3 rounded-xl bg-black/60 border border-amber-600/30 text-center">
                   <span className="text-xl sm:text-2xl font-black text-amber-300 font-mono block">Pro Mat</span>
-                  <span className="text-[11px] text-stone-400">डे-नाईट फ्लडलाइट्स</span>
+                  <span className="text-[11px] text-stone-400">डे-नाईट फ्लडलाइट्स कोर्ट</span>
                 </div>
                 <div className="p-3 rounded-xl bg-black/60 border border-amber-600/30 text-center col-span-2 sm:col-span-1">
                   <span className="text-xl sm:text-2xl font-black text-amber-300 font-mono block">₹51,000+</span>
@@ -366,14 +417,14 @@ export default async function HomePage() {
                   className="festive-btn-gold text-xs sm:text-sm px-5 py-2.5 flex items-center gap-2"
                 >
                   <Trophy className="w-4 h-4 text-maroon-950" />
-                  <span>कबड्डी एरिना व खिलाड़ी प्रोफाइल देखें</span>
+                  <span>खिलाड़ी प्रोफाइल व लाइव स्कोर देखें</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
-                  href="/register?type=KABADDI_TEAM"
-                  className="festive-btn-red text-xs sm:text-sm px-5 py-2.5 flex items-center gap-2"
+                  href="/about"
+                  className="bg-black/60 hover:bg-black/80 text-amber-200 border border-amber-500/40 text-xs sm:text-sm px-5 py-2.5 rounded-full font-bold"
                 >
-                  <span>टीम पंजीकरण करें</span>
+                  <span>माँ चंडिका स्थान व समिति इतिहास</span>
                 </Link>
               </div>
             </div>

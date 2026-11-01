@@ -72,6 +72,7 @@ export default function CmsManager({
 
   // Section Edit State
   const [editingSection, setEditingSection] = useState<SectionItem | null>(null);
+  const [isCreatingSection, setIsCreatingSection] = useState(false);
   const [sectionForm, setSectionForm] = useState({
     sectionKey: '',
     title: '',
@@ -170,7 +171,30 @@ export default function CmsManager({
   };
 
   // --- SECTION HANDLERS ---
+  const openCreateSection = (presetKey?: string) => {
+    setIsCreatingSection(true);
+    const initialKey = presetKey || `ABOUT_${Date.now()}`;
+    setEditingSection({
+      id: '',
+      sectionKey: initialKey,
+      title: '',
+      subtitle: '',
+      content: '',
+      mediaUrl: '',
+      isPublished: true,
+    });
+    setSectionForm({
+      sectionKey: initialKey,
+      title: '',
+      subtitle: '',
+      content: '',
+      mediaUrl: '',
+      isPublished: true,
+    });
+  };
+
   const openEditSection = (s: SectionItem) => {
+    setIsCreatingSection(false);
     setEditingSection(s);
     setSectionForm({
       sectionKey: s.sectionKey,
@@ -180,6 +204,25 @@ export default function CmsManager({
       mediaUrl: s.mediaUrl || '',
       isPublished: s.isPublished,
     });
+  };
+
+  const handleDeleteSection = async (sec: SectionItem) => {
+    if (!confirm(`क्या आप वाकई सेक्शन "${sec.title || sec.sectionKey}" को हटाना चाहते हैं?`)) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/cms?sectionKey=${encodeURIComponent(sec.sectionKey)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'सेक्शन हटाने में विफल');
+      setSections(sections.filter((s) => s.sectionKey !== sec.sectionKey));
+      setFeedback(`सेक्शन "${sec.sectionKey}" सफलतापूर्वक हटा दिया गया!`);
+      setTimeout(() => setFeedback(null), 3000);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveSection = async (e: React.FormEvent) => {
@@ -199,9 +242,15 @@ export default function CmsManager({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'सेक्शन सहेजने में विफल');
 
-      setSections(sections.map((s) => (s.sectionKey === data.section.sectionKey ? data.section : s)));
+      if (isCreatingSection) {
+        setSections([...sections.filter((s) => s.sectionKey !== data.section.sectionKey), data.section]);
+        setFeedback('नया सामग्री सेक्शन सफलतापूर्वक जोड़ा गया!');
+      } else {
+        setSections(sections.map((s) => (s.sectionKey === data.section.sectionKey ? data.section : s)));
+        setFeedback('वेबसाइट सामग्री सेक्शन सफलतापूर्वक अपडेट किया गया!');
+      }
       setEditingSection(null);
-      setFeedback('वेबसाइट सामग्री सेक्शन सफलतापूर्वक अपडेट किया गया!');
+      setIsCreatingSection(false);
       setTimeout(() => setFeedback(null), 3000);
     } catch (err: any) {
       alert(err.message);
@@ -364,9 +413,38 @@ export default function CmsManager({
       {/* --- TAB 2: SECTIONS CMS --- */}
       {activeTab === 'SECTIONS' && (
         <div className="space-y-4">
-          <h3 className="text-base font-bold text-amber-200 font-serif">
-            होमपेज मुख्य सामग्री सेक्शन्स (Customizable Sections)
-          </h3>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-base font-bold text-amber-200 font-serif">
+                पेज सामग्री व About Us सेक्शन्स (Customizable Sections)
+              </h3>
+              <p className="text-xs text-stone-400">यहाँ से समिति परिचय, मंदिर इतिहास एवं होमपेज के सेक्शन्स व चित्र प्रबंधित करें</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => openCreateSection('ABOUT_CHANDIKA_ASTHAN')}
+                className="bg-black/60 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs px-3 py-1.5 rounded-xl font-bold"
+              >
+                + चंडिका स्थान
+              </button>
+              <button
+                type="button"
+                onClick={() => openCreateSection('ABOUT_HISTORY')}
+                className="bg-black/60 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs px-3 py-1.5 rounded-xl font-bold"
+              >
+                + इतिहास (1984)
+              </button>
+              <button
+                type="button"
+                onClick={() => openCreateSection()}
+                className="festive-btn-gold text-xs px-3.5 py-2 flex items-center gap-1.5 font-bold shadow"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>नया सेक्शन जोड़ें</span>
+              </button>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {sections.map((sec) => (
@@ -391,18 +469,34 @@ export default function CmsManager({
                     <p className="text-xs text-amber-300/80 font-medium">{sec.subtitle}</p>
                   )}
 
+                  {sec.mediaUrl && (
+                    <div className="h-32 rounded-xl overflow-hidden border border-amber-900/60 mt-2 bg-black">
+                      <img src={sec.mediaUrl} alt={sec.title} className="w-full h-full object-cover" />
+                    </div>
+                  )}
+
                   <p className="text-xs text-stone-300 line-clamp-4 mt-2 leading-relaxed bg-black/30 p-2.5 rounded-xl border border-stone-800">
                     {sec.content}
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-amber-900/40 flex justify-end">
+                <div className="pt-2 border-t border-amber-900/40 flex items-center justify-between">
                   <button
+                    type="button"
+                    onClick={() => handleDeleteSection(sec)}
+                    className="p-1.5 bg-red-950/60 hover:bg-red-900 text-red-300 rounded flex items-center gap-1 text-[11px] font-semibold transition-colors"
+                    title="सेक्शन हटाएं"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>हटाएं</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => openEditSection(sec)}
                     className="festive-btn-gold text-xs px-3.5 py-1.5 flex items-center gap-1.5"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
-                    <span>सामग्री संपादित करें</span>
+                    <span>संपादित करें</span>
                   </button>
                 </div>
               </div>
@@ -642,24 +736,47 @@ export default function CmsManager({
         </div>
       )}
 
-      {/* --- SECTION EDIT MODAL --- */}
+      {/* --- SECTION EDIT / CREATE MODAL --- */}
       {editingSection && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-gradient-to-b from-maroon-950 to-black border-2 border-amber-500 rounded-3xl p-6 max-w-lg w-full shadow-2xl relative my-6">
             <button
+              type="button"
               onClick={() => setEditingSection(null)}
               className="absolute top-4 right-4 text-stone-400 hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>
             <h3 className="text-lg font-bold text-amber-200 font-serif mb-1">
-              पेज सामग्री सेक्शन संपादित करें
+              {isCreatingSection ? 'नया पेज सामग्री सेक्शन जोड़ें' : 'पेज सामग्री सेक्शन संपादित करें'}
             </h3>
             <p className="text-xs text-stone-400 mb-4 font-mono">
-              Key: {editingSection.sectionKey}
+              Key: {sectionForm.sectionKey}
             </p>
 
             <form onSubmit={handleSaveSection} className="space-y-3.5 text-xs">
+              {isCreatingSection && (
+                <div>
+                  <label className="block text-stone-300 font-semibold mb-1">सेक्शन की (Unique Section Key) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={sectionForm.sectionKey}
+                    onChange={(e) =>
+                      setSectionForm({
+                        ...sectionForm,
+                        sectionKey: e.target.value.toUpperCase().replace(/\s+/g, '_'),
+                      })
+                    }
+                    placeholder="उदा. ABOUT_HISTORY, ABOUT_CHANDIKA_ASTHAN"
+                    className="w-full px-3 py-2 bg-black/50 border border-amber-900/50 rounded-xl text-stone-200 font-mono"
+                  />
+                  <span className="text-[10px] text-amber-400/80">
+                    सुझाव: About Page के लिए "ABOUT_" से शुरू होने वाली Key रखें।
+                  </span>
+                </div>
+              )}
+
               <div>
                 <label className="block text-stone-300 font-semibold mb-1">सेक्शन शीर्षक (Title) *</label>
                 <input
@@ -667,6 +784,7 @@ export default function CmsManager({
                   required
                   value={sectionForm.title}
                   onChange={(e) => setSectionForm({ ...sectionForm, title: e.target.value })}
+                  placeholder="उदा. माँ चंडिका स्थान, परोरा का इतिहास"
                   className="w-full px-3 py-2 bg-black/50 border border-amber-900/50 rounded-xl text-stone-200"
                 />
               </div>
@@ -677,6 +795,18 @@ export default function CmsManager({
                   type="text"
                   value={sectionForm.subtitle}
                   onChange={(e) => setSectionForm({ ...sectionForm, subtitle: e.target.value })}
+                  placeholder="उदा. स्थापना वर्ष 1984 से अविरल"
+                  className="w-full px-3 py-2 bg-black/50 border border-amber-900/50 rounded-xl text-stone-200"
+                />
+              </div>
+
+              <div>
+                <label className="block text-stone-300 font-semibold mb-1">चित्र URL (Image Link - Optional)</label>
+                <input
+                  type="url"
+                  value={sectionForm.mediaUrl}
+                  onChange={(e) => setSectionForm({ ...sectionForm, mediaUrl: e.target.value })}
+                  placeholder="https://images.unsplash.com/... अथवा इमेज लिंक"
                   className="w-full px-3 py-2 bg-black/50 border border-amber-900/50 rounded-xl text-stone-200"
                 />
               </div>
@@ -688,6 +818,7 @@ export default function CmsManager({
                   required
                   value={sectionForm.content}
                   onChange={(e) => setSectionForm({ ...sectionForm, content: e.target.value })}
+                  placeholder="यहाँ विस्तृत इतिहास, परंपरा एवं विवरण लिखें..."
                   className="w-full px-3 py-2 bg-black/50 border border-amber-900/50 rounded-xl text-stone-200 leading-relaxed"
                 />
               </div>
@@ -706,32 +837,29 @@ export default function CmsManager({
               </div>
 
               {/* Live Preview Box */}
-              <div className="p-3 bg-black/70 border border-amber-500/40 rounded-xl space-y-1.5">
-                <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider block">
-                  👁️ रीयल-टाइम पूर्वावलोकन (Live Preview)
-                </span>
-                <div className="relative h-44 rounded-xl overflow-hidden border border-amber-500/30 bg-black">
-                  <img
-                    src={bannerForm.imageUrl || 'https://images.unsplash.com/photo-1605647540924-852290f6b0d5?auto=format&fit=crop&w=1200&q=80'}
-                    alt="Preview"
-                    className="w-full h-full object-cover object-center"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-maroon-950 via-maroon-950/40 to-transparent" />
-                  <div className="absolute top-2 left-2">
-                    <span className="px-2 py-0.5 rounded-full text-[9px] bg-red-600 text-white font-bold">
-                      {bannerForm.badgeText || '🔴 दिव्य दर्शन'}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-2 left-2 right-2">
-                    <h4 className="text-xs font-bold text-amber-200 truncate font-serif">
-                      {bannerForm.title || 'बैनर मुख्य शीर्षक यहाँ दिखेगा'}
-                    </h4>
-                    <p className="text-[10px] text-stone-300 truncate">
-                      {bannerForm.subtitle || 'उपशीर्षक एवं विवरण'}
-                    </p>
+              {sectionForm.mediaUrl && (
+                <div className="p-3 bg-black/70 border border-amber-500/40 rounded-xl space-y-1.5">
+                  <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider block">
+                    👁️ चित्र पूर्वावलोकन (Image Preview)
+                  </span>
+                  <div className="relative h-40 rounded-xl overflow-hidden border border-amber-500/30 bg-black">
+                    <img
+                      src={sectionForm.mediaUrl}
+                      alt="Section preview"
+                      className="w-full h-full object-cover object-center"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-maroon-950 via-transparent to-transparent" />
+                    <div className="absolute bottom-2 left-2 right-2">
+                      <h4 className="text-xs font-bold text-amber-200 truncate font-serif">
+                        {sectionForm.title || 'सेक्शन शीर्षक'}
+                      </h4>
+                      <p className="text-[10px] text-stone-300 truncate">
+                        {sectionForm.subtitle || 'उपशीर्षक'}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-amber-900/40">
                 <button
