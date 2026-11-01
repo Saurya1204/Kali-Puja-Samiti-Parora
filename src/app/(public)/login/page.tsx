@@ -39,8 +39,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'लॉगिन असफल रहा');
 
-      router.push('/admin');
-      router.refresh();
+      window.location.href = '/admin';
     } catch (err: any) {
       setError(err.message || 'लॉगिन त्रुटि');
     } finally {
