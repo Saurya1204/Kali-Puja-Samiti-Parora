@@ -10,44 +10,49 @@ if (typeof process !== 'undefined') {
   }
 }
 
-const MONGO_URI =
-  process.env.DATABASE_URL ||
-  process.env.MONGO_URL ||
-  'mongodb+srv://gk1204kr:GbxiGEitN2W2p1U3@cluster0.yxtklsn.mongodb.net/kalipujaparora?retryWrites=true&w=majority';
+function getValidMongoUri(): string {
+  const DEFAULT_URI =
+    'mongodb+srv://gk1204kr:GbxiGEitN2W2p1U3@cluster0.yxtklsn.mongodb.net/kalipujaparora?retryWrites=true&w=majority';
 
-// Global connection caching across serverless invocations (Next.js & Vercel)
-interface GlobalMongo {
-  client?: MongoClient;
-  db?: any;
+  // Check MONGO_URL first, then DATABASE_URL
+  const candidates = [process.env.MONGO_URL, process.env.DATABASE_URL];
+  for (const cand of candidates) {
+    if (cand && typeof cand === 'string') {
+      const trimmed = cand.trim();
+      if (trimmed.startsWith('mongodb://') || trimmed.startsWith('mongodb+srv://')) {
+        return trimmed;
+      }
+    }
+  }
+
+  return DEFAULT_URI;
 }
 
-const globalForMongo = global as unknown as { _mongoClientPromise?: Promise<MongoClient>; _mongoDb?: any };
+// Global connection caching across serverless invocations (Next.js & Vercel)
+const globalForMongo = global as unknown as {
+  _mongoClientPromise?: Promise<MongoClient>;
+  _mongoDb?: any;
+};
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
+export async function getDb() {
+  if (globalForMongo._mongoDb) {
+    return globalForMongo._mongoDb;
+  }
 
-if (process.env.NODE_ENV === 'development') {
+  const uri = getValidMongoUri();
+
   if (!globalForMongo._mongoClientPromise) {
-    client = new MongoClient(MONGO_URI, {
+    const client = new MongoClient(uri, {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 8000,
       retryWrites: true,
     });
     globalForMongo._mongoClientPromise = client.connect();
   }
-  clientPromise = globalForMongo._mongoClientPromise;
-} else {
-  client = new MongoClient(MONGO_URI, {
-    maxPoolSize: 10,
-    serverSelectionTimeoutMS: 8000,
-    retryWrites: true,
-  });
-  clientPromise = client.connect();
-}
 
-export async function getDb() {
-  const connectedClient = await clientPromise;
-  return connectedClient.db('kalipujaparora');
+  const connectedClient = await globalForMongo._mongoClientPromise;
+  globalForMongo._mongoDb = connectedClient.db('kalipujaparora');
+  return globalForMongo._mongoDb;
 }
 
 /**
@@ -484,8 +489,11 @@ export const mongodb = new Proxy(
 
       if (prop === '$disconnect') {
         return async () => {
-          if (client) {
-            await client.close();
+          if (globalForMongo._mongoClientPromise) {
+            const cl = await globalForMongo._mongoClientPromise;
+            await cl.close();
+            delete globalForMongo._mongoClientPromise;
+            delete globalForMongo._mongoDb;
           }
         };
       }
@@ -506,3 +514,4 @@ export const mongodb = new Proxy(
 ) as any;
 
 export default mongodb;
+
