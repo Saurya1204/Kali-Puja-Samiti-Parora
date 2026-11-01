@@ -158,7 +158,7 @@ export default function ReportsClient({ data }: { data: ReportData }) {
                 Annual Financial Statement
               </span>
               <h2 className="text-2xl font-extrabold text-amber-200 font-serif">
-                श्री श्री 108 काली पूजा समिति परोरा (पूर्णिया, बिहार)
+                श्री श्री 108 काली पूजा समिति परोरा (बेगूसराय, बिहार - 851217)
               </h2>
               <span className="text-xs text-stone-400">
                 महोत्सव सत्र: {data.festivalYear} | तुलन पत्र एवं आय-व्यय विवरण

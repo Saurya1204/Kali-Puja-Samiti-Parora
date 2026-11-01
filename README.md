@@ -1,8 +1,10 @@
 # Kali Puja Samiti Parora – Official Website & Complete Management System
 
-> **श्री श्री 108 काली पूजा समिति परोरा (पूर्णिया, बिहार)**  
+> **श्री श्री 108 काली पूजा समिति परोरा (बेगूसराय, बिहार - 851217)**  
 > Govt Registration No: `BR-PUR-2012/KP-042` | Established: `1984`  
-> Annual Celebration: **9th & 10th November** (Configurable annually, immediately following Deepavali)
+> Annual Celebration: **9th & 10th November** (Configurable annually, immediately following Deepavali)  
+> Chief Patron & Coach: **Shri Amarnath Prasad** (`6203510983`)  
+> Samiti President: **Shri Sillu Kumar**
 
 ---
 
@@ -22,9 +24,11 @@ A production-ready digital platform built for **Kali Puja Samiti Parora**, featu
 - **Animations**: Diya flame animations, celebratory confetti (`canvas-confetti`), glassmorphic cards
 - **Icons**: Lucide React
 - **Analytics & Graphs**: Recharts
-- **Database & ORM**: PostgreSQL / SQLite with Prisma ORM
+- **Database & ORM**: MongoDB Atlas with Prisma ORM
 - **Exporting**: Excel (`xlsx`) and formatted printable PDF view (`@media print`)
 - **Authentication & Security**: Role-Based Access Control (RBAC), bcrypt password hashing, secure session management, immutable audit logging
+- **Super Admin CMS**: Real-time Hero Banner & Content Studio with Maa Kali Darshan presets and live preview
+- **Mobile First**: Touch-swipe deity photo gallery, full-screen Darshan lightbox, and floating 5-action bottom bar
 
 ---
 
@@ -91,8 +95,8 @@ You can log in at `/login` using the quick-fill buttons or the credentials below
 
 | Role | Email | Password | Primary Permissions |
 | :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin@kalipujaparora.org` | `admin123` | Full system access, settings, user management |
-| **President** | `president@kalipujaparora.org` | `president123` | View overall management, approve transactions |
+| **Super Admin** (Amarnath Prasad) | `admin@kalipujaparora.org` | `admin123` | Full system access, CMS Studio, settings, user management (Phone: `6203510983`) |
+| **President** (Sillu Kumar) | `president@kalipujaparora.org` | `president123` | View overall management, approve transactions |
 | **Secretary** | `secretary@kalipujaparora.org` | `secretary123` | Events, registrations, notices, committee |
 | **Treasurer** | `treasurer@kalipujaparora.org` | `treasurer123` | Expenses, bills, donations, ledger, vendors |
 | **Event Manager** | `events@kalipujaparora.org` | `events123` | Event schedules, live kabaddi score console |

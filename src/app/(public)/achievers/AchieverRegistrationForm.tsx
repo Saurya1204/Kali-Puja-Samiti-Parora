@@ -203,7 +203,7 @@ export default function AchieverRegistrationForm() {
             <input
               type="text"
               required
-              placeholder="उदा. जिला स्कूल पूर्णिया / पूर्णिया कॉलेज"
+              placeholder="उदा. जीडी कॉलेज बेगूसराय / बीपी स्कूल"
               value={formData.schoolOrCollege}
               onChange={(e) => setFormData({ ...formData, schoolOrCollege: e.target.value })}
               className="w-full bg-black/50 border border-amber-700/50 rounded-xl px-4 py-2.5 text-stone-100 placeholder-stone-500 focus:outline-none focus:border-amber-400"

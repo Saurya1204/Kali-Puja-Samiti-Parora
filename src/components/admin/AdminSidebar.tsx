@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import DiyaAnimation from '@/components/public/DiyaAnimation';
+import SamitiLogo from '@/components/public/SamitiLogo';
 import {
   LayoutDashboard,
   Receipt,
@@ -24,7 +24,9 @@ import {
   LogOut,
   ExternalLink,
   ShieldCheck,
-  UserCheck,
+  Menu,
+  X,
+  Layers,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -40,8 +42,12 @@ interface NavItem {
   allowedRoles: string[];
 }
 
-export default function AdminSidebar({ userRole = 'SUPER_ADMIN', userName = 'Admin' }: SidebarProps) {
+export default function AdminSidebar({
+  userRole = 'SUPER_ADMIN',
+  userName = 'Admin',
+}: SidebarProps) {
   const pathname = usePathname();
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const allNavItems: NavItem[] = [
     {
@@ -52,7 +58,7 @@ export default function AdminSidebar({ userRole = 'SUPER_ADMIN', userName = 'Adm
     },
     {
       href: '/admin/kabaddi',
-      label: 'कबड्डी मैच व स्कोर (Kabaddi)',
+      label: 'कबड्डी मैच, स्कोर व खिलाड़ी (Kabaddi)',
       icon: Trophy,
       highlight: userRole === 'KABADDI_ADMIN',
       allowedRoles: ['SUPER_ADMIN', 'PRESIDENT', 'SECRETARY', 'KABADDI_ADMIN', 'EVENT_MANAGER'],
@@ -100,6 +106,13 @@ export default function AdminSidebar({ userRole = 'SUPER_ADMIN', userName = 'Adm
       label: 'वित्तीय रिपोर्ट्स (Reports)',
       icon: FileSpreadsheet,
       allowedRoles: ['SUPER_ADMIN', 'PRESIDENT', 'TREASURER', 'FINANCE_ADMIN'],
+    },
+    {
+      href: '/admin/cms',
+      label: 'CMS बैनर व सामग्री (CMS Content)',
+      icon: Layers,
+      highlight: userRole === 'SUPER_ADMIN',
+      allowedRoles: ['SUPER_ADMIN'],
     },
     {
       href: '/admin/events',
@@ -153,7 +166,6 @@ export default function AdminSidebar({ userRole = 'SUPER_ADMIN', userName = 'Adm
     },
   ];
 
-  // Filter items by role
   const filteredNavItems = allNavItems.filter((item) =>
     item.allowedRoles.includes(userRole)
   );
@@ -184,26 +196,25 @@ export default function AdminSidebar({ userRole = 'SUPER_ADMIN', userName = 'Adm
     }
   };
 
-  return (
-    <aside className="w-64 bg-maroon-950 border-r border-amber-600/30 flex flex-col justify-between h-screen sticky top-0 z-30 select-none">
-      {/* Branding */}
+  const sidebarContent = (
+    <div className="flex flex-col justify-between h-full">
+      {/* Branding Header */}
       <div className="p-4 border-b border-amber-900/40">
-        <div className="flex items-center gap-2.5">
-          <DiyaAnimation size="sm" />
-          <div>
-            <h2 className="font-serif text-base font-bold text-amber-300 leading-tight">
-              समिति प्रबंधन
-            </h2>
-            <span className="text-[10px] text-amber-200/70 font-mono">
-              Kali Puja Samiti Portal
-            </span>
-          </div>
+        <div className="flex items-center justify-between">
+          <SamitiLogo size="sm" showSubtitle={false} />
+          {/* Close button for mobile */}
+          <button
+            onClick={() => setIsMobileOpen(false)}
+            className="lg:hidden p-1 text-stone-400 hover:text-white"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* User Role Tag */}
         <div className="mt-3 bg-black/50 border border-amber-500/20 rounded-xl p-2.5 flex items-center justify-between text-xs">
           <div className="min-w-0 pr-2">
-            <span className="font-bold text-stone-200 block truncate">
+            <span className="font-bold text-stone-200 block truncate text-xs">
               {userName}
             </span>
             <span
@@ -238,6 +249,7 @@ export default function AdminSidebar({ userRole = 'SUPER_ADMIN', userName = 'Adm
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setIsMobileOpen(false)}
               className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all font-medium ${
                 isActive
                   ? 'bg-amber-500 text-maroon-950 font-bold shadow-md shadow-amber-500/20'
@@ -263,6 +275,41 @@ export default function AdminSidebar({ userRole = 'SUPER_ADMIN', userName = 'Adm
           <span>लॉगआउट (Logout)</span>
         </button>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Mobile Menu Trigger Button (Rendered at top on mobile) */}
+      <button
+        onClick={() => setIsMobileOpen(true)}
+        className="lg:hidden fixed bottom-5 right-5 z-40 bg-amber-500 text-maroon-950 p-3.5 rounded-full shadow-2xl border-2 border-amber-300 flex items-center gap-1.5 font-bold text-xs"
+        aria-label="व्यवस्थापक मेनू खोलें"
+      >
+        <Menu className="w-5 h-5" />
+        <span>मेनू</span>
+      </button>
+
+      {/* Desktop Sticky Sidebar */}
+      <aside className="hidden lg:block w-64 bg-maroon-950 border-r border-amber-600/30 h-screen sticky top-0 z-30 select-none shrink-0">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Slide-Over Drawer */}
+      {isMobileOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div
+            onClick={() => setIsMobileOpen(false)}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+          />
+
+          {/* Drawer Panel */}
+          <div className="relative w-72 max-w-[80vw] bg-maroon-950 border-r border-amber-600/40 h-full z-10 shadow-2xl animate-in slide-in-from-left duration-200">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -1,0 +1,560 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./client"
+}
+
+datasource db {
+  provider = "sqlite" // Can be easily switched to "postgresql" for production Supabase / Neon
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(uuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         String     @default("VOLUNTEER") // SUPER_ADMIN, PRESIDENT, SECRETARY, TREASURER, FINANCE_ADMIN, KABADDI_ADMIN, AWARDS_ADMIN, EVENT_MANAGER, VOLUNTEER
+  phone        String?
+  isActive     Boolean    @default(true)
+  avatarUrl    String?
+  bio          String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  auditLogs    AuditLog[]
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  userName  String?
+  action    String
+  module    String
+  recordId  String?
+  details   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model WebsiteSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+}
+
+model FestivalYear {
+  id          String   @id @default(uuid())
+  year        Int      @unique
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  venue       String   @default("Parora, Bihar")
+  theme       String?
+  isActive    Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  events               Event[]
+  registrations        EventRegistration[]
+  kabaddiTeams         KabaddiTeam[]
+  kabaddiMatches       KabaddiMatch[]
+  studentAchievements  StudentAchievement[]
+  expenses             Expense[]
+  donations            Donation[]
+  sponsors             Sponsor[]
+  budgets              Budget[]
+  financialTransactions FinancialTransaction[]
+  ledgerEntries        LedgerEntry[]
+  galleries            Gallery[]
+  announcements        Announcement[]
+  notices              Notice[]
+  committeeMembers     CommitteeMember[]
+  volunteers           Volunteer[]
+}
+
+model EventCategory {
+  id          String   @id @default(uuid())
+  name        String
+  nameHindi   String?
+  slug        String   @unique
+  icon        String?
+  description String?
+  sortOrder   Int      @default(0)
+  events      Event[]
+}
+
+model Event {
+  id                 String              @id @default(uuid())
+  festivalYearId     String
+  categoryId         String
+  title              String
+  titleHindi         String?
+  description        String?
+  date               DateTime
+  startTime          String?
+  endTime            String?
+  venue              String?
+  bannerUrl          String?
+  organizerName      String?
+  organizerContact   String?
+  rules              String?
+  prizeDetails       String?
+  status             String              @default("UPCOMING") // UPCOMING, LIVE, COMPLETED, CANCELLED
+  isPublished        Boolean             @default(true)
+  maxParticipants    Int?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  festivalYear       FestivalYear        @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+  category           EventCategory       @relation(fields: [categoryId], references: [id])
+  registrations      EventRegistration[]
+  expenses           Expense[]
+}
+
+model EventRegistration {
+  id                 String       @id @default(uuid())
+  festivalYearId     String
+  eventId            String
+  registrationNumber String       @unique
+  applicantName      String
+  guardianName       String?
+  phone              String
+  email              String?
+  village            String?
+  registrationType   String       @default("INDIVIDUAL") // INDIVIDUAL, TEAM, CULTURAL, VOLUNTEER, OTHER
+  detailsJson        String?
+  status             String       @default("PENDING") // PENDING, APPROVED, REJECTED
+  adminRemarks       String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  festivalYear       FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+  event              Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model KabaddiTeam {
+  id             String         @id @default(uuid())
+  festivalYearId String
+  teamName       String
+  villageOrClub  String?
+  logoUrl        String?
+  captainName    String
+  captainPhone   String
+  coachName      String?
+  status         String         @default("REGISTERED") // REGISTERED, CONFIRMED, ELIMINATED, RUNNER_UP, WINNER
+  points         Int            @default(0)
+  matchesPlayed  Int            @default(0)
+  matchesWon     Int            @default(0)
+  matchesLost    Int            @default(0)
+  matchesTied    Int            @default(0)
+  scoreDiff      Int            @default(0)
+  createdAt      DateTime       @default(now())
+
+  festivalYear   FestivalYear   @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+  players        KabaddiPlayer[]
+  matchesAsTeamA KabaddiMatch[] @relation("MatchesTeamA")
+  matchesAsTeamB KabaddiMatch[] @relation("MatchesTeamB")
+}
+
+model KabaddiPlayer {
+  id                 String      @id @default(uuid())
+  teamId             String
+  name               String
+  jerseyNumber       Int?
+  role               String      @default("ALL_ROUNDER") // RAIDER, DEFENDER, ALL_ROUNDER
+  isCaptain          Boolean     @default(false)
+  phone              String?
+  photoUrl           String?
+  villageOrDistrict  String?
+  skills             String?
+  achievements       String?
+  bio                String?
+  weight             String?
+  height             String?
+  age                Int?
+  matchesPlayed      Int         @default(0)
+  raidPoints         Int         @default(0)
+  tacklePoints       Int         @default(0)
+  superRaids         Int         @default(0)
+  superTackles       Int         @default(0)
+
+  team               KabaddiTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+}
+
+model KabaddiMatch {
+  id             String       @id @default(uuid())
+  festivalYearId String
+  matchNumber    Int
+  stage          String       @default("GROUP_STAGE") // GROUP_STAGE, QUARTER_FINAL, SEMI_FINAL, FINAL
+  teamAId        String
+  teamBId        String
+  teamAScore     Int          @default(0)
+  teamBScore     Int          @default(0)
+  status         String       @default("SCHEDULED") // SCHEDULED, LIVE, COMPLETED
+  winnerId       String?
+  scheduledTime  DateTime?
+  venue          String?
+  commentary     String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  festivalYear   FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+  teamA          KabaddiTeam  @relation("MatchesTeamA", fields: [teamAId], references: [id])
+  teamB          KabaddiTeam  @relation("MatchesTeamB", fields: [teamBId], references: [id])
+}
+
+model StudentAchievement {
+  id                     String       @id @default(uuid())
+  festivalYearId         String
+  studentName            String
+  guardianName           String?
+  village                String
+  schoolOrCollege        String
+  courseOrClass          String
+  category               String       // CLASS_10, CLASS_12, GRADUATION, POST_GRADUATION, COMPETITIVE_EXAM, GOVT_JOB, SPORTS, OTHER
+  examOrCompetitionName  String
+  marksPercentageOrRank  String
+  yearOfPassing          Int
+  certificateUrl         String?
+  photoUrl               String?
+  contactNumber          String
+  status                 String       @default("PENDING") // PENDING, APPROVED, REJECTED
+  prizeAssigned          String?
+  prizeGiven             Boolean      @default(false)
+  remarks                String?
+  isPublished            Boolean      @default(false)
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  festivalYear           FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+}
+
+model ExpenseCategory {
+  id                String             @id @default(uuid())
+  name              String             @unique
+  nameHindi         String?
+  description       String?
+  isDefault         Boolean            @default(false)
+  sortOrder         Int                @default(0)
+  expenses          Expense[]
+  budgetAllocations BudgetAllocation[]
+}
+
+model Vendor {
+  id                 String    @id @default(uuid())
+  name               String
+  businessName       String?
+  phone              String
+  altPhone           String?
+  address            String?
+  serviceCategory    String
+  upiId              String?
+  bankAccountNumber  String?
+  ifscCode           String?
+  totalBilled        Float     @default(0)
+  totalPaid          Float     @default(0)
+  outstandingBalance Float     @default(0)
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  expenses           Expense[]
+  payments           Payment[]
+}
+
+model Expense {
+  id                 String           @id @default(uuid())
+  festivalYearId     String
+  categoryId         String
+  eventId            String?
+  vendorId           String?
+  title              String
+  billNumber         String?
+  billDate           DateTime
+  paymentDate        DateTime?
+  amount             Float
+  paymentMethod      String           @default("CASH") // CASH, UPI, BANK_TRANSFER, CHEQUE, OTHER
+  paymentStatus      String           @default("PAID") // PAID, PARTIAL, UNPAID
+  advanceAmount      Float            @default(0)
+  paidAmount         Float            @default(0)
+  outstandingAmount  Float            @default(0)
+  description        String?
+  billFileUrl        String?
+  receiptFileUrl     String?
+  addedById          String?
+  approvalStatus     String           @default("APPROVED") // PENDING, APPROVED, REJECTED
+  approvedById       String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  festivalYear       FestivalYear     @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+  category           ExpenseCategory  @relation(fields: [categoryId], references: [id])
+  event              Event?           @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  vendor             Vendor?          @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  payments           Payment[]
+  bills              Bill[]
+}
+
+model Bill {
+  id            String   @id @default(uuid())
+  expenseId     String
+  invoiceNumber String?
+  billDate      DateTime
+  amount        Float
+  fileUrl       String?
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  expense       Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id            String   @id @default(uuid())
+  expenseId     String
+  vendorId      String?
+  amount        Float
+  paymentDate   DateTime @default(now())
+  paymentMethod String   @default("CASH")
+  transactionRef String?
+  receiptUrl    String?
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  expense       Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  vendor        Vendor?  @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+}
+
+model Budget {
+  id             String             @id @default(uuid())
+  festivalYearId String             @unique
+  totalAllocated Float              @default(0)
+  notes          String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  festivalYear   FestivalYear       @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+  allocations    BudgetAllocation[]
+}
+
+model BudgetAllocation {
+  id              String          @id @default(uuid())
+  budgetId        String
+  categoryId      String
+  allocatedAmount Float           @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  budget          Budget          @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  category        ExpenseCategory @relation(fields: [categoryId], references: [id])
+
+  @@unique([budgetId, categoryId])
+}
+
+model IncomeCategory {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  nameHindi   String?
+  description String?
+  donations   Donation[]
+}
+
+model Donation {
+  id                    String          @id @default(uuid())
+  festivalYearId        String
+  categoryId            String?
+  donorName             String
+  donorPhone            String?
+  donorEmail            String?
+  donorAddressOrVillage String?
+  amount                Float
+  donationDate          DateTime        @default(now())
+  paymentMethod         String          @default("UPI") // CASH, UPI, BANK_TRANSFER, CHEQUE, OTHER
+  transactionRef        String?
+  receiptNumber         String          @unique
+  purpose               String?         @default("Kali Puja Utsav Donation")
+  remarks               String?
+  receiptFileUrl        String?
+  isPubliclyVisible     Boolean         @default(true)
+  status                String          @default("CONFIRMED") // CONFIRMED, PENDING, REVERSED
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  festivalYear          FestivalYear    @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+  category              IncomeCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+}
+
+model Sponsor {
+  id                 String       @id @default(uuid())
+  festivalYearId     String
+  name               String
+  brandName          String?
+  logoUrl            String?
+  sponsorTier        String       @default("GOLD") // PLATINUM, GOLD, SILVER, BRONZE, SUPPORTER
+  contributionAmount Float?
+  isAmountPublic     Boolean      @default(false)
+  contactPerson      String?
+  phone              String?
+  websiteUrl         String?
+  bannerUrl          String?
+  sortOrder          Int          @default(0)
+  isPublished        Boolean      @default(true)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  festivalYear       FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+}
+
+model FinancialTransaction {
+  id             String       @id @default(uuid())
+  festivalYearId String
+  type           String       // INCOME, EXPENSE, ADJUSTMENT
+  referenceType  String       // DONATION, SPONSOR, EXPENSE, BILL_PAYMENT, OPENING_BALANCE
+  referenceId    String?
+  amount         Float
+  paymentMethod  String       @default("CASH")
+  transactionDate DateTime    @default(now())
+  description    String
+  runningBalance Float        @default(0)
+  createdAt      DateTime     @default(now())
+
+  festivalYear   FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+}
+
+model LedgerEntry {
+  id             String       @id @default(uuid())
+  festivalYearId String
+  accountType    String       @default("CASH") // CASH, BANK_UPI
+  debit          Float        @default(0)
+  credit         Float        @default(0)
+  balance        Float        @default(0)
+  description    String
+  referenceId    String?
+  createdAt      DateTime     @default(now())
+
+  festivalYear   FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+}
+
+model Gallery {
+  id             String         @id @default(uuid())
+  festivalYearId String
+  title          String
+  titleHindi     String?
+  category       String         @default("PUJA") // PUJA, KABADDI, CULTURAL, PRIZE_DISTRIBUTION, PREPARATION, OTHER
+  coverImageUrl  String
+  eventDate      DateTime?
+  createdAt      DateTime       @default(now())
+
+  festivalYear   FestivalYear   @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+  media          GalleryMedia[]
+}
+
+model GalleryMedia {
+  id        String   @id @default(uuid())
+  galleryId String
+  mediaType String   @default("IMAGE") // IMAGE, VIDEO
+  mediaUrl  String
+  caption   String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  gallery   Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+}
+
+model Announcement {
+  id               String       @id @default(uuid())
+  festivalYearId   String
+  title            String
+  titleHindi       String?
+  message          String
+  messageHindi     String?
+  category         String       @default("GENERAL") // GENERAL, URGENT, EVENT_UPDATE, WINNER, SCHEDULE_CHANGE
+  isPinned         Boolean      @default(false)
+  isUrgent         Boolean      @default(false)
+  fileAttachmentUrl String?
+  validUntil       DateTime?
+  isActive         Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  festivalYear     FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+}
+
+model Notice {
+  id             String       @id @default(uuid())
+  festivalYearId String
+  title          String
+  titleHindi     String?
+  content        String
+  circularNumber String?
+  fileUrl        String?
+  isPublished    Boolean      @default(true)
+  publishDate    DateTime     @default(now())
+  createdAt      DateTime     @default(now())
+
+  festivalYear   FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+}
+
+model CommitteeMember {
+  id               String       @id @default(uuid())
+  festivalYearId   String
+  name             String
+  nameHindi        String?
+  designation      String       // President, Secretary, Treasurer, Vice President, etc.
+  designationHindi String?
+  roleCategory     String       @default("OFFICE_BEARER") // OFFICE_BEARER, EXECUTIVE_MEMBER, ADVISORY_BOARD, EVENT_COORDINATOR
+  phone            String?
+  email            String?
+  photoUrl         String?
+  sortOrder        Int          @default(0)
+  message          String?
+  createdAt        DateTime     @default(now())
+
+  festivalYear     FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+}
+
+model Volunteer {
+  id             String       @id @default(uuid())
+  festivalYearId String
+  name           String
+  phone          String
+  email          String?
+  village        String?
+  preferredRole  String?
+  availability   String?
+  status         String       @default("REGISTERED") // REGISTERED, ASSIGNED, COMPLETED
+  assignedTask   String?
+  createdAt      DateTime     @default(now())
+
+  festivalYear   FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
+}
+
+model CmsBanner {
+  id          String   @id @default(uuid())
+  title       String
+  subtitle    String?
+  page        String   @default("HOMEPAGE") // HOMEPAGE, KABADDI, ABOUT, EVENTS, GALLERY
+  bannerType  String   @default("HERO_SLIDER") // HERO_SLIDER, PROMO_BANNER, POPUP_ALERT, SPOTLIGHT
+  imageUrl    String
+  linkUrl     String?
+  buttonText  String?
+  badgeText   String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CmsContentSection {
+  id          String   @id @default(uuid())
+  sectionKey  String   @unique // e.g. "HERO_INTRO", "KABADDI_SPOTLIGHT", "COACH_MESSAGE", "PRESIDENT_DESK"
+  title       String
+  subtitle    String?
+  content     String
+  mediaUrl    String?
+  extraJson   String?
+  isPublished Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}

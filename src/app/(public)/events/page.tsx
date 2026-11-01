@@ -136,7 +136,7 @@ export default async function EventsPage({
                   </div>
                   <div className="flex items-center gap-2 text-stone-300">
                     <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>{ev.venue || 'परोरा, पूर्णिया'}</span>
+                    <span>{ev.venue || 'परोरा, बेगूसराय (851217)'}</span>
                   </div>
                 </div>
 

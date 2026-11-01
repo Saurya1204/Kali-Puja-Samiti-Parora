@@ -1,29 +1,31 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./client"
 }
 
 datasource db {
-  provider = "sqlite" // Can be easily switched to "postgresql" for production Supabase / Neon
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id           String     @id @default(uuid())
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   email        String     @unique
   passwordHash String
-  role         String     @default("VOLUNTEER") // SUPER_ADMIN, PRESIDENT, SECRETARY, TREASURER, EVENT_MANAGER, VOLUNTEER
+  role         String     @default("VOLUNTEER") // SUPER_ADMIN, PRESIDENT, SECRETARY, TREASURER, FINANCE_ADMIN, KABADDI_ADMIN, AWARDS_ADMIN, EVENT_MANAGER, VOLUNTEER
   phone        String?
   isActive     Boolean    @default(true)
   avatarUrl    String?
+  bio          String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   auditLogs    AuditLog[]
 }
 
 model AuditLog {
-  id        String   @id @default(uuid())
-  userId    String?
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String?  @db.ObjectId
   userName  String?
   action    String
   module    String
@@ -35,7 +37,7 @@ model AuditLog {
 }
 
 model WebsiteSetting {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   key         String   @unique
   value       String
   description String?
@@ -43,38 +45,38 @@ model WebsiteSetting {
 }
 
 model FestivalYear {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   year        Int      @unique
   name        String
   startDate   DateTime
   endDate     DateTime
-  venue       String   @default("Parora, Bihar")
+  venue       String   @default("Parora, Begusarai, Bihar - 851217")
   theme       String?
   isActive    Boolean  @default(false)
   isArchived  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  events               Event[]
-  registrations        EventRegistration[]
-  kabaddiTeams         KabaddiTeam[]
-  kabaddiMatches       KabaddiMatch[]
-  studentAchievements  StudentAchievement[]
-  expenses             Expense[]
-  donations            Donation[]
-  sponsors             Sponsor[]
-  budgets              Budget[]
+  events                Event[]
+  registrations         EventRegistration[]
+  kabaddiTeams          KabaddiTeam[]
+  kabaddiMatches        KabaddiMatch[]
+  studentAchievements   StudentAchievement[]
+  expenses              Expense[]
+  donations             Donation[]
+  sponsors              Sponsor[]
+  budgets               Budget[]
   financialTransactions FinancialTransaction[]
-  ledgerEntries        LedgerEntry[]
-  galleries            Gallery[]
-  announcements        Announcement[]
-  notices              Notice[]
-  committeeMembers     CommitteeMember[]
-  volunteers           Volunteer[]
+  ledgerEntries         LedgerEntry[]
+  galleries             Gallery[]
+  announcements         Announcement[]
+  notices               Notice[]
+  committeeMembers      CommitteeMember[]
+  volunteers            Volunteer[]
 }
 
 model EventCategory {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   nameHindi   String?
   slug        String   @unique
@@ -85,9 +87,9 @@ model EventCategory {
 }
 
 model Event {
-  id                 String              @id @default(uuid())
-  festivalYearId     String
-  categoryId         String
+  id                 String              @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId     String              @db.ObjectId
+  categoryId         String              @db.ObjectId
   title              String
   titleHindi         String?
   description        String?
@@ -113,9 +115,9 @@ model Event {
 }
 
 model EventRegistration {
-  id                 String       @id @default(uuid())
-  festivalYearId     String
-  eventId            String
+  id                 String       @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId     String       @db.ObjectId
+  eventId            String       @db.ObjectId
   registrationNumber String       @unique
   applicantName      String
   guardianName       String?
@@ -134,8 +136,8 @@ model EventRegistration {
 }
 
 model KabaddiTeam {
-  id             String         @id @default(uuid())
-  festivalYearId String
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId String         @db.ObjectId
   teamName       String
   villageOrClub  String?
   logoUrl        String?
@@ -158,23 +160,37 @@ model KabaddiTeam {
 }
 
 model KabaddiPlayer {
-  id           String      @id @default(uuid())
-  teamId       String
-  name         String
-  jerseyNumber Int?
-  role         String      @default("ALL_ROUNDER") // RAIDER, DEFENDER, ALL_ROUNDER
-  isCaptain    Boolean     @default(false)
-  phone        String?
-  team         KabaddiTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  id                 String      @id @default(auto()) @map("_id") @db.ObjectId
+  teamId             String      @db.ObjectId
+  name               String
+  jerseyNumber       Int?
+  role               String      @default("ALL_ROUNDER") // RAIDER, DEFENDER, ALL_ROUNDER
+  isCaptain          Boolean     @default(false)
+  phone              String?
+  photoUrl           String?
+  villageOrDistrict  String?
+  skills             String?
+  achievements       String?
+  bio                String?
+  weight             String?
+  height             String?
+  age                Int?
+  matchesPlayed      Int         @default(0)
+  raidPoints         Int         @default(0)
+  tacklePoints       Int         @default(0)
+  superRaids         Int         @default(0)
+  superTackles       Int         @default(0)
+
+  team               KabaddiTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 
 model KabaddiMatch {
-  id             String       @id @default(uuid())
-  festivalYearId String
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId String       @db.ObjectId
   matchNumber    Int
   stage          String       @default("GROUP_STAGE") // GROUP_STAGE, QUARTER_FINAL, SEMI_FINAL, FINAL
-  teamAId        String
-  teamBId        String
+  teamAId        String       @db.ObjectId
+  teamBId        String       @db.ObjectId
   teamAScore     Int          @default(0)
   teamBScore     Int          @default(0)
   status         String       @default("SCHEDULED") // SCHEDULED, LIVE, COMPLETED
@@ -191,8 +207,8 @@ model KabaddiMatch {
 }
 
 model StudentAchievement {
-  id                     String       @id @default(uuid())
-  festivalYearId         String
+  id                     String       @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId         String       @db.ObjectId
   studentName            String
   guardianName           String?
   village                String
@@ -217,7 +233,7 @@ model StudentAchievement {
 }
 
 model ExpenseCategory {
-  id                String             @id @default(uuid())
+  id                String             @id @default(auto()) @map("_id") @db.ObjectId
   name              String             @unique
   nameHindi         String?
   description       String?
@@ -228,7 +244,7 @@ model ExpenseCategory {
 }
 
 model Vendor {
-  id                 String    @id @default(uuid())
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
   name               String
   businessName       String?
   phone              String
@@ -250,11 +266,11 @@ model Vendor {
 }
 
 model Expense {
-  id                 String           @id @default(uuid())
-  festivalYearId     String
-  categoryId         String
-  eventId            String?
-  vendorId           String?
+  id                 String           @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId     String           @db.ObjectId
+  categoryId         String           @db.ObjectId
+  eventId            String?          @db.ObjectId
+  vendorId           String?          @db.ObjectId
   title              String
   billNumber         String?
   billDate           DateTime
@@ -283,8 +299,8 @@ model Expense {
 }
 
 model Bill {
-  id            String   @id @default(uuid())
-  expenseId     String
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  expenseId     String   @db.ObjectId
   invoiceNumber String?
   billDate      DateTime
   amount        Float
@@ -296,9 +312,9 @@ model Bill {
 }
 
 model Payment {
-  id            String   @id @default(uuid())
-  expenseId     String
-  vendorId      String?
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  expenseId     String   @db.ObjectId
+  vendorId      String?  @db.ObjectId
   amount        Float
   paymentDate   DateTime @default(now())
   paymentMethod String   @default("CASH")
@@ -312,8 +328,8 @@ model Payment {
 }
 
 model Budget {
-  id             String             @id @default(uuid())
-  festivalYearId String             @unique
+  id             String             @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId String             @unique @db.ObjectId
   totalAllocated Float              @default(0)
   notes          String?
   createdAt      DateTime           @default(now())
@@ -324,9 +340,9 @@ model Budget {
 }
 
 model BudgetAllocation {
-  id              String          @id @default(uuid())
-  budgetId        String
-  categoryId      String
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  budgetId        String          @db.ObjectId
+  categoryId      String          @db.ObjectId
   allocatedAmount Float           @default(0)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
@@ -338,7 +354,7 @@ model BudgetAllocation {
 }
 
 model IncomeCategory {
-  id          String     @id @default(uuid())
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
   name        String     @unique
   nameHindi   String?
   description String?
@@ -346,9 +362,9 @@ model IncomeCategory {
 }
 
 model Donation {
-  id                    String          @id @default(uuid())
-  festivalYearId        String
-  categoryId            String?
+  id                    String          @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId        String          @db.ObjectId
+  categoryId            String?         @db.ObjectId
   donorName             String
   donorPhone            String?
   donorEmail            String?
@@ -371,8 +387,8 @@ model Donation {
 }
 
 model Sponsor {
-  id                 String       @id @default(uuid())
-  festivalYearId     String
+  id                 String       @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId     String       @db.ObjectId
   name               String
   brandName          String?
   logoUrl            String?
@@ -392,8 +408,8 @@ model Sponsor {
 }
 
 model FinancialTransaction {
-  id             String       @id @default(uuid())
-  festivalYearId String
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId String       @db.ObjectId
   type           String       // INCOME, EXPENSE, ADJUSTMENT
   referenceType  String       // DONATION, SPONSOR, EXPENSE, BILL_PAYMENT, OPENING_BALANCE
   referenceId    String?
@@ -408,8 +424,8 @@ model FinancialTransaction {
 }
 
 model LedgerEntry {
-  id             String       @id @default(uuid())
-  festivalYearId String
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId String       @db.ObjectId
   accountType    String       @default("CASH") // CASH, BANK_UPI
   debit          Float        @default(0)
   credit         Float        @default(0)
@@ -422,8 +438,8 @@ model LedgerEntry {
 }
 
 model Gallery {
-  id             String         @id @default(uuid())
-  festivalYearId String
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId String         @db.ObjectId
   title          String
   titleHindi     String?
   category       String         @default("PUJA") // PUJA, KABADDI, CULTURAL, PRIZE_DISTRIBUTION, PREPARATION, OTHER
@@ -436,8 +452,8 @@ model Gallery {
 }
 
 model GalleryMedia {
-  id        String   @id @default(uuid())
-  galleryId String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  galleryId String   @db.ObjectId
   mediaType String   @default("IMAGE") // IMAGE, VIDEO
   mediaUrl  String
   caption   String?
@@ -448,8 +464,8 @@ model GalleryMedia {
 }
 
 model Announcement {
-  id               String       @id @default(uuid())
-  festivalYearId   String
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId   String       @db.ObjectId
   title            String
   titleHindi       String?
   message          String
@@ -467,8 +483,8 @@ model Announcement {
 }
 
 model Notice {
-  id             String       @id @default(uuid())
-  festivalYearId String
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId String       @db.ObjectId
   title          String
   titleHindi     String?
   content        String
@@ -482,8 +498,8 @@ model Notice {
 }
 
 model CommitteeMember {
-  id               String       @id @default(uuid())
-  festivalYearId   String
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId   String       @db.ObjectId
   name             String
   nameHindi        String?
   designation      String       // President, Secretary, Treasurer, Vice President, etc.
@@ -500,8 +516,8 @@ model CommitteeMember {
 }
 
 model Volunteer {
-  id             String       @id @default(uuid())
-  festivalYearId String
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  festivalYearId String       @db.ObjectId
   name           String
   phone          String
   email          String?
@@ -515,3 +531,30 @@ model Volunteer {
   festivalYear   FestivalYear @relation(fields: [festivalYearId], references: [id], onDelete: Cascade)
 }
 
+model CmsBanner {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  subtitle    String?
+  page        String   @default("HOMEPAGE") // HOMEPAGE, KABADDI, ABOUT, EVENTS, GALLERY
+  bannerType  String   @default("HERO_SLIDER") // HERO_SLIDER, PROMO_BANNER, POPUP_ALERT, SPOTLIGHT
+  imageUrl    String
+  linkUrl     String?
+  buttonText  String?
+  badgeText   String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CmsContentSection {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  sectionKey  String   @unique // e.g. "HERO_INTRO", "KABADDI_SPOTLIGHT", "COACH_MESSAGE", "PRESIDENT_DESK"
+  title       String
+  subtitle    String?
+  content     String
+  mediaUrl    String?
+  extraJson   String?
+  isPublished Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}

@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import FestivalCountdown from '@/components/public/FestivalCountdown';
 import DiyaAnimation from '@/components/public/DiyaAnimation';
 import WhatsAppShareButton from '@/components/public/WhatsAppShareButton';
+import HeroBannerSlider from '@/components/public/HeroBannerSlider';
 import { formatINR, formatDate } from '@/lib/utils';
 import {
   Sparkles,
@@ -21,6 +22,10 @@ import {
   HelpCircle,
   Vote,
   ExternalLink,
+  ShieldCheck,
+  Phone,
+  Award,
+  Medal,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -82,6 +87,22 @@ export default async function HomePage() {
     });
   }
 
+  // Fetch CMS Banners and Dynamic Content Sections
+  const [cmsBanners, cmsSections] = await Promise.all([
+    prisma.cmsBanner.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: 'asc' },
+    }),
+    prisma.cmsContentSection.findMany({
+      where: { isPublished: true },
+    }),
+  ]);
+
+  const sectionMap = new Map(cmsSections.map((s) => [s.sectionKey, s]));
+  const coachMessage = sectionMap.get('COACH_MESSAGE');
+  const presidentDesk = sectionMap.get('PRESIDENT_DESK');
+  const kabaddiSpotlight = sectionMap.get('KABADDI_SPOTLIGHT');
+
   const liveMatch = festivalYear?.kabaddiMatches?.[0];
 
   return (
@@ -128,7 +149,7 @@ export default async function HomePage() {
             </div>
             <div className="flex items-center gap-1.5 bg-black/40 border border-amber-500/40 px-3.5 py-1.5 rounded-full">
               <MapPin className="w-4 h-4 text-amber-400" />
-              <span>{festivalYear?.venue || 'Parora, Purnea, Bihar'}</span>
+              <span>{festivalYear?.venue || 'Parora, Begusarai, Bihar - 851217'}</span>
             </div>
           </div>
 
@@ -166,6 +187,13 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* DYNAMIC CMS HERO BANNERS (SUPER ADMIN CMS) - ENLARGED FOR REALTIME MAA KALI DARSHAN */}
+      {cmsBanners.length > 0 && (
+        <section className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 -mt-4 sm:-mt-8">
+          <HeroBannerSlider banners={cmsBanners} />
+        </section>
+      )}
 
       {/* LIVE KABADDI STATUS BANNER (IF ACTIVE) */}
       {liveMatch && (
@@ -255,6 +283,114 @@ export default async function HomePage() {
             <h4 className="font-bold text-amber-300 text-sm sm:text-base">Online Chanda / Seva</h4>
             <p className="text-xs text-stone-400 mt-1">सुरक्षित UPI व बैंक रसीद</p>
           </Link>
+        </div>
+      </section>
+
+      {/* KABADDI – THE HEART OF PARORA FESTIVAL & LEADERSHIP */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-gradient-to-br from-[#1a0505] via-[#240808] to-maroon-950 border-2 border-amber-500/50 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+          {/* Decorative glow */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+            {/* Left Col: Kabaddi Heritage & Parora Legacy */}
+            <div className="lg:col-span-7 space-y-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-600/20 text-red-300 border border-red-500/40 text-xs font-bold uppercase tracking-wider">
+                <Trophy className="w-4 h-4 text-amber-400" />
+                <span>{kabaddiSpotlight?.subtitle || 'अखिल बिहार प्रसिद्ध परोरा कबड्डी टीम का स्वर्णिम इतिहास'}</span>
+              </div>
+
+              <h3 className="text-2xl sm:text-4xl font-extrabold text-amber-200 font-serif leading-tight">
+                {kabaddiSpotlight?.title || 'कबड्डी – परोरा महोत्सव की धड़कन'}
+              </h3>
+
+              <p className="text-xs sm:text-sm text-stone-300 leading-relaxed">
+                {kabaddiSpotlight?.content ||
+                  'काली पूजा महोत्सव के साथ-साथ कबड्डी इस पूरे आयोजन का प्राण है। परोरा टीम पूरे बिहार में अपने आक्रामक खेल, अनुकरणीय अनुशासन और राष्ट्रीय स्तर की प्रतिभाओं के लिए जानी जाती है।'}
+              </p>
+
+              {/* Quick Arena highlights */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+                <div className="p-3 rounded-xl bg-black/60 border border-amber-600/30 text-center">
+                  <span className="text-xl sm:text-2xl font-black text-amber-300 font-mono block">8+</span>
+                  <span className="text-[11px] text-stone-400">शीर्ष राज्यस्तरीय टीमें</span>
+                </div>
+                <div className="p-3 rounded-xl bg-black/60 border border-amber-600/30 text-center">
+                  <span className="text-xl sm:text-2xl font-black text-amber-300 font-mono block">Pro Mat</span>
+                  <span className="text-[11px] text-stone-400">डे-नाईट फ्लडलाइट्स</span>
+                </div>
+                <div className="p-3 rounded-xl bg-black/60 border border-amber-600/30 text-center col-span-2 sm:col-span-1">
+                  <span className="text-xl sm:text-2xl font-black text-amber-300 font-mono block">₹51,000+</span>
+                  <span className="text-[11px] text-stone-400">नकद पुरस्कार व शील्ड</span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/kabaddi"
+                  className="festive-btn-gold text-xs sm:text-sm px-5 py-2.5 flex items-center gap-2"
+                >
+                  <Trophy className="w-4 h-4 text-maroon-950" />
+                  <span>कबड्डी एरिना व खिलाड़ी प्रोफाइल देखें</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="/register?type=KABADDI_TEAM"
+                  className="festive-btn-red text-xs sm:text-sm px-5 py-2.5 flex items-center gap-2"
+                >
+                  <span>टीम पंजीकरण करें</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Col: Leadership Tribute (Coach Amarnath Prasad & President Sillu Kumar) */}
+            <div className="lg:col-span-5 space-y-4">
+              {/* Coach Amarnath Prasad Card */}
+              <div className="p-5 rounded-2xl bg-black/70 border border-amber-500/40 relative overflow-hidden space-y-2.5 shadow-xl">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-mono uppercase tracking-wider font-extrabold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                      Chief Sports Mentor & Super Admin
+                    </span>
+                    <h4 className="text-lg font-bold text-white font-serif">
+                      श्री अमरनाथ प्रसाद (Amarnath Prasad)
+                    </h4>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                    <Medal className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <p className="text-xs text-stone-300 leading-snug">
+                  बिहार कबड्डी के शीर्ष कोच व मार्गदर्शक, जिन्होंने बिहार कबड्डी को दर्जनों राष्ट्रीय प्रतिभाएं दी हैं। पूर्व कबड्डी खिलाड़ी, बिहार राज्य पूर्व बॉक्सर एवं कराटे ब्लैक बेल्ट।
+                </p>
+
+                <div className="pt-2 border-t border-amber-900/60 flex items-center justify-between text-xs text-amber-300">
+                  <span className="text-[11px] text-stone-400">संपर्क / मार्गदर्शन:</span>
+                  <a href="tel:6203510983" className="flex items-center gap-1.5 font-bold hover:underline font-mono">
+                    <Phone className="w-3.5 h-3.5 text-amber-400" />
+                    <span>6203510983</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* President Sillu Kumar Card */}
+              <div className="p-4 rounded-2xl bg-black/60 border border-amber-600/30 space-y-1.5 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono uppercase tracking-wider font-extrabold text-amber-400">
+                    Current President (अध्यक्ष)
+                  </span>
+                  <span className="text-[10px] text-stone-400 font-mono">समिति सत्र 2026</span>
+                </div>
+                <h4 className="text-base font-bold text-stone-100 font-serif">
+                  श्री सिल्लू कुमार (Sillu Kumar)
+                </h4>
+                <p className="text-xs text-stone-300 leading-snug">
+                  अध्यक्ष, श्री श्री 108 काली पूजा समिति परोरा। &quot;माँ काली की कृपा से हम निष्पक्षता, भव्यता और सामाजिक एकता के साथ इस महोत्सव को नई ऊंचाइयों पर ले जाने हेतु समर्पित हैं।&quot;
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

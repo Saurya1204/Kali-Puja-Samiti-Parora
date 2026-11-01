@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require('./client');
 const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
@@ -43,18 +43,20 @@ async function main() {
   const passwordHash = await bcrypt.hash('admin123', 10);
   const users = [
     {
-      name: 'Dr. Rameshwar Prasad Singh',
+      name: 'Amarnath Prasad',
       email: 'admin@kalipujaparora.org',
       passwordHash,
       role: 'SUPER_ADMIN',
-      phone: '+91 94312 88491',
+      phone: '6203510983',
+      bio: 'बिहार कबड्डी के शीर्ष कोच व मार्गदर्शक, जिन्होंने बिहार कबड्डी को दर्जनों राष्ट्रीय प्रतिभाएं दी हैं। पूर्व कबड्डी खिलाड़ी, बिहार राज्य पूर्व बॉक्सर एवं कराटे ब्लैक बेल्ट।',
     },
     {
-      name: 'Shri Birendra Kumar Yadav',
+      name: 'Sillu Kumar',
       email: 'president@kalipujaparora.org',
       passwordHash,
       role: 'PRESIDENT',
       phone: '+91 98350 21478',
+      bio: 'अध्यक्ष, श्री श्री 108 काली पूजा समिति परोरा (बेगूसराय)',
     },
     {
       name: 'Er. Gaurav Singh',
@@ -82,28 +84,21 @@ async function main() {
       email: 'kabaddi@kalipujaparora.org',
       passwordHash,
       role: 'KABADDI_ADMIN',
-      phone: '+91 98352 11984',
+      phone: '6203510983',
     },
     {
-      name: 'Prof. Alok Nath Jha (Pratibha Samman Head)',
+      name: 'Dr. Rameshwar Prasad Singh',
       email: 'awards@kalipujaparora.org',
       passwordHash,
       role: 'AWARDS_ADMIN',
-      phone: '+91 94702 33456',
+      phone: '+91 94312 88491',
     },
     {
-      name: 'Vikash Kumar Mandal',
-      email: 'events@kalipujaparora.org',
-      passwordHash,
-      role: 'EVENT_MANAGER',
-      phone: '+91 99341 66723',
-    },
-    {
-      name: 'Pankaj Kumar',
+      name: 'Vikash Kumar (Volunteer Lead)',
       email: 'volunteer@kalipujaparora.org',
       passwordHash,
       role: 'VOLUNTEER',
-      phone: '+91 82103 99124',
+      phone: '+91 91228 33412',
     },
   ];
 
@@ -119,7 +114,7 @@ async function main() {
       name: 'Kali Puja Utsav 2026',
       startDate: new Date('2026-11-09T08:00:00Z'),
       endDate: new Date('2026-11-10T23:59:59Z'),
-      venue: 'Maa Kali Mandir Parisar & High School Ground, Parora, Purnea',
+      venue: 'Maa Kali Mandir Parisar & Sports Ground, Parora, Begusarai - 851217',
       theme: 'आस्था, एकता, खेल एवं युवा उत्थान',
       isActive: true,
       isArchived: false,
@@ -163,7 +158,7 @@ async function main() {
     { key: 'BANK_NAME', value: 'State Bank of India', description: 'Bank Name' },
     { key: 'BANK_ACCOUNT_NO', value: '38920194829', description: 'Account Number' },
     { key: 'BANK_IFSC', value: 'SBIN0001234', description: 'Bank IFSC Code' },
-    { key: 'BANK_BRANCH', value: 'Kasba Branch, Purnea', description: 'Bank Branch' },
+    { key: 'BANK_BRANCH', value: 'Main Branch, Begusarai (851217)', description: 'Bank Branch' },
     { key: 'CONTACT_PHONE_1', value: '+91 94312 88491', description: 'President Phone' },
     { key: 'CONTACT_PHONE_2', value: '+91 97714 55321', description: 'Secretary Phone' },
     { key: 'CONTACT_EMAIL', value: 'contact@kalipujaparora.org', description: 'Contact Email' },
@@ -307,9 +302,9 @@ async function main() {
     { teamName: 'K. Nagar Stars', villageOrClub: 'Krityanand Nagar', captainName: 'Mohit Yadav', captainPhone: '+91 98765 33443', points: 4, matchesPlayed: 2, matchesWon: 1, matchesLost: 1, status: 'CONFIRMED' },
     { teamName: 'Dhamdaha Champions', villageOrClub: 'Dhamdaha', captainName: 'Sunil Soren', captainPhone: '+91 98765 44554', points: 6, matchesPlayed: 2, matchesWon: 2, matchesLost: 0, status: 'CONFIRMED' },
     { teamName: 'Banmankhi Panthers', villageOrClub: 'Banmankhi', captainName: 'Deepak Jha', captainPhone: '+91 98765 55665', points: 2, matchesPlayed: 2, matchesWon: 0, matchesLost: 2, status: 'CONFIRMED' },
-    { teamName: 'Purnea City Club', villageOrClub: 'Purnea City', captainName: 'Gaurav Roy', captainPhone: '+91 98765 66776', points: 4, matchesPlayed: 2, matchesWon: 1, matchesLost: 1, status: 'CONFIRMED' },
+    { teamName: 'Begusarai City Club', villageOrClub: 'Begusarai', captainName: 'Gaurav Roy', captainPhone: '+91 98765 66776', points: 4, matchesPlayed: 2, matchesWon: 1, matchesLost: 1, status: 'CONFIRMED' },
     { teamName: 'Maranga Strikers', villageOrClub: 'Maranga', captainName: 'Manish Paswan', captainPhone: '+91 98765 77887', points: 0, matchesPlayed: 2, matchesWon: 0, matchesLost: 2, status: 'CONFIRMED' },
-    { teamName: 'Madhubani Kings', villageOrClub: 'Madhubani, Purnea', captainName: 'Sanjay Sahni', captainPhone: '+91 98765 88998', points: 4, matchesPlayed: 2, matchesWon: 1, matchesLost: 1, status: 'CONFIRMED' },
+    { teamName: 'Madhubani Kings', villageOrClub: 'Barauni, Begusarai', captainName: 'Sanjay Sahni', captainPhone: '+91 98765 88998', points: 4, matchesPlayed: 2, matchesWon: 1, matchesLost: 1, status: 'CONFIRMED' },
   ];
 
   const createdTeams = [];
@@ -322,19 +317,186 @@ async function main() {
     });
     createdTeams.push(team);
 
-    // Add players
-    const roles = ['RAIDER', 'DEFENDER', 'ALL_ROUNDER'];
-    for (let i = 1; i <= 7; i++) {
-      await prisma.kabaddiPlayer.create({
-        data: {
-          teamId: team.id,
-          name: i === 1 ? team.captainName : `Player ${i} (${team.villageOrClub})`,
-          jerseyNumber: i,
-          role: roles[i % 3],
-          isCaptain: i === 1,
-          phone: i === 1 ? team.captainPhone : null,
+    // Add rich players with full profiles, skills, and stats
+    if (t.teamName.includes('Parora')) {
+      const paroraRoster = [
+        {
+          name: 'अमित कुमार सिंह (Amit Kumar)',
+          jerseyNumber: 7,
+          role: 'RAIDER',
+          isCaptain: true,
+          phone: team.captainPhone,
+          villageOrDistrict: 'परोरा (बेगूसराय)',
+          skills: 'Running Hand Touch, Dubki, Bonus Master, Quick Turn',
+          achievements: 'Best Raider - Bihar State Kabaddi Championship 2024, Parora Gold Cup MVP 2025, Senior Bihar Team Camp Attendee',
+          bio: 'श्री अमरनाथ प्रसाद जी के प्रिय शिष्य। 14 वर्ष की आयु से परोरा अखाड़े में प्रशिक्षित। बिहार राज्य के सबसे तेज रेडर्स में शुमार।',
+          height: '5 ft 10 in',
+          weight: '78 kg',
+          age: 23,
+          matchesPlayed: 26,
+          raidPoints: 194,
+          tacklePoints: 16,
+          superRaids: 12,
+          superTackles: 1,
+          photoUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
         },
-      });
+        {
+          name: 'विक्रम सोरेन (Vikram Soren)',
+          jerseyNumber: 2,
+          role: 'DEFENDER',
+          isCaptain: false,
+          phone: '9835012345',
+          villageOrDistrict: 'परोरा (बेगूसराय)',
+          skills: 'Ankle Hold, Back Hold, Corner Dive, Chain Tackle',
+          achievements: 'Best Defender - Begusarai District League 2024, Senior State Bronze 2025',
+          bio: 'परोरा टाइगर्स की रक्षा पंक्ति की रीढ़। कोच अमरनाथ प्रसाद के मार्गदर्शन में एंकल होल्ड में विशेषज्ञता।',
+          height: '5 ft 11 in',
+          weight: '82 kg',
+          age: 24,
+          matchesPlayed: 24,
+          raidPoints: 9,
+          tacklePoints: 68,
+          superRaids: 0,
+          superTackles: 8,
+          photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+        },
+        {
+          name: 'राजेश पासवान (Rajesh Paswan)',
+          jerseyNumber: 5,
+          role: 'ALL_ROUNDER',
+          isCaptain: false,
+          phone: '9835023456',
+          villageOrDistrict: 'परोरा (बेगूसराय)',
+          skills: 'Chain Tackle, Fast Hand Touch, Do-or-Die Specialist',
+          achievements: 'Kosi Region Inter-District Silver Medalist 2024',
+          bio: 'रेड और डिफेंस दोनों में समान रूप से निपुण। डू-ऑर-डाई परिस्थितियों में टीम के संकटमोचक।',
+          height: '5 ft 9 in',
+          weight: '76 kg',
+          age: 22,
+          matchesPlayed: 22,
+          raidPoints: 62,
+          tacklePoints: 44,
+          superRaids: 3,
+          superTackles: 4,
+          photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+        },
+        {
+          name: 'धर्मेंद्र कुमार यादव (Dharmendra Yadav)',
+          jerseyNumber: 3,
+          role: 'DEFENDER',
+          isCaptain: false,
+          villageOrDistrict: 'परोरा (बेगूसराय)',
+          skills: 'Dash, Thigh Hold, Block',
+          achievements: 'Bihar School Sports Gold Medalist',
+          bio: 'कवर डिफेंस के विशेषज्ञ। भारी-भरकम रेडर्स को अकेले डैश करने की अद्भुत शारीरिक क्षमता।',
+          height: '5 ft 10 in',
+          weight: '81 kg',
+          age: 21,
+          matchesPlayed: 19,
+          raidPoints: 4,
+          tacklePoints: 51,
+          superRaids: 0,
+          superTackles: 6,
+          photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+        },
+        {
+          name: 'रोशन कुमार (Roshan Kumar)',
+          jerseyNumber: 9,
+          role: 'RAIDER',
+          isCaptain: false,
+          villageOrDistrict: 'परोरा (बेगूसराय)',
+          skills: 'Dubki, Frog Jump, Toe Touch',
+          achievements: 'Inter-College Gold Medalist 2025',
+          bio: 'बिजली जैसी फुर्तीले युवा रेडर। डुबकी लगाकर कॉर्नर डिफेंडर्स के नीचे से निकलने में माहिर।',
+          height: '5 ft 8 in',
+          weight: '71 kg',
+          age: 20,
+          matchesPlayed: 18,
+          raidPoints: 88,
+          tacklePoints: 11,
+          superRaids: 5,
+          superTackles: 1,
+          photoUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80',
+        },
+        {
+          name: 'मनीष कुमार (Manish Kumar)',
+          jerseyNumber: 4,
+          role: 'DEFENDER',
+          isCaptain: false,
+          villageOrDistrict: 'परोरा (बेगूसराय)',
+          skills: 'Chain Tackle, Diving Ankle Hold',
+          achievements: 'District Championship Runner-Up 2024',
+          bio: 'लेफ्ट कॉर्नर पर अचूक टैकल करने वाले भरोसेमंद डिफेंडर।',
+          height: '5 ft 9 in',
+          weight: '77 kg',
+          age: 22,
+          matchesPlayed: 17,
+          raidPoints: 3,
+          tacklePoints: 42,
+          superRaids: 0,
+          superTackles: 3,
+          photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
+        },
+        {
+          name: 'संजय कुमार महतो (Sanjay Mahato)',
+          jerseyNumber: 8,
+          role: 'ALL_ROUNDER',
+          isCaptain: false,
+          villageOrDistrict: 'परोरा (बेगूसराय)',
+          skills: 'Toe Touch, Running Kick, Cover Support',
+          achievements: 'State Rural Sports Festival Medalist',
+          bio: 'परोरा टाइगर्स के निरंतर प्रयासरत हरफनमौला खिलाड़ी।',
+          height: '5 ft 9 in',
+          weight: '75 kg',
+          age: 21,
+          matchesPlayed: 16,
+          raidPoints: 46,
+          tacklePoints: 32,
+          superRaids: 2,
+          superTackles: 2,
+          photoUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=400&q=80',
+        },
+      ];
+      for (const p of paroraRoster) {
+        await prisma.kabaddiPlayer.create({
+          data: {
+            teamId: team.id,
+            ...p,
+          },
+        });
+      }
+    } else {
+      const roles = ['RAIDER', 'DEFENDER', 'ALL_ROUNDER'];
+      const skillPresets = [
+        'Running Hand Touch, Bonus Specialist',
+        'Ankle Hold, Block, Dash Specialist',
+        'All Rounder, Chain Tackle, Quick Escape',
+      ];
+      for (let i = 1; i <= 7; i++) {
+        await prisma.kabaddiPlayer.create({
+          data: {
+            teamId: team.id,
+            name: i === 1 ? team.captainName : `खिलाड़ी ${i} (${team.villageOrClub})`,
+            jerseyNumber: i * 2 + 1,
+            role: roles[i % 3],
+            isCaptain: i === 1,
+            phone: i === 1 ? team.captainPhone : null,
+            villageOrDistrict: team.villageOrClub,
+            skills: skillPresets[i % 3],
+            achievements: i === 1 ? 'जिला स्तरीय कबड्डी टूर्नामेंट उत्कृष्ट प्रदर्शन 2024' : 'प्रखंड स्तरीय विजेता दल सदस्य',
+            bio: `${team.villageOrClub} टीम के प्रमुख खिलाड़ी, नियमित अभ्यास एवं उत्कृष्ट खेल भावना।`,
+            height: `${5 + (i % 2)} ft ${8 + (i % 4)} in`,
+            weight: `${72 + (i * 2)} kg`,
+            age: 20 + (i % 5),
+            matchesPlayed: 10 + i,
+            raidPoints: (i % 2 === 0 ? 35 : 75) + i * 3,
+            tacklePoints: (i % 2 === 1 ? 15 : 45) + i * 2,
+            superRaids: i % 3 === 0 ? 3 : 1,
+            superTackles: i % 2 === 0 ? 2 : 0,
+            photoUrl: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80`,
+          },
+        });
+      }
     }
   }
 
@@ -397,7 +559,7 @@ async function main() {
       studentName: 'Anjali Kumari',
       guardianName: 'Shri Ramakant Singh',
       village: 'Parora (Tola Purab)',
-      schoolOrCollege: 'Zila School Purnea',
+      schoolOrCollege: 'BS High School Begusarai',
       courseOrClass: '10th Board (BSEB)',
       category: 'CLASS_10',
       examOrCompetitionName: 'Bihar Board Matric Examination 2026',
@@ -414,7 +576,7 @@ async function main() {
       studentName: 'Aditya Kumar Jha',
       guardianName: 'Late B. K. Jha',
       village: 'Parora',
-      schoolOrCollege: 'Purnea College, Purnea',
+      schoolOrCollege: 'GD College, Begusarai',
       courseOrClass: '12th Science (BSEB)',
       category: 'CLASS_12',
       examOrCompetitionName: 'Bihar Intermediate Examination 2026',
@@ -523,7 +685,7 @@ async function main() {
       name: 'Rameshwar Tent & Event House',
       businessName: 'Maa Durga Tent & Light Works',
       phone: '+91 94314 11200',
-      address: 'Main Road Kasba, Near Railway Crossing, Purnea',
+      address: 'Main Road, Near Station, Begusarai',
       serviceCategory: 'Tent, Stage & Pandal',
       upiId: 'rameshwartent@paytm',
       bankAccountNumber: '20194829104',
@@ -537,7 +699,7 @@ async function main() {
       name: 'Sunil Kumar Sharma',
       businessName: 'Swar Sangam Sound & DJ Systems',
       phone: '+91 98351 99281',
-      address: 'Line Bazar, Purnea',
+      address: 'Har Har Mahadev Chowk, Begusarai',
       serviceCategory: 'Sound & Audio Systems',
       upiId: 'swarsangam@okaxis',
       bankAccountNumber: '91827364512',
@@ -551,7 +713,7 @@ async function main() {
       name: 'Rakesh Prasad Roy',
       businessName: 'Shree Krishna Sweets & Catering Services',
       phone: '+91 91223 88192',
-      address: 'Parora Market, Purnea',
+      address: 'Parora Bazar, Begusarai - 851217',
       serviceCategory: 'Food, Prasad & Catering',
       upiId: 'shreekrishnasweets@icici',
       totalBilled: 42000,
@@ -563,7 +725,7 @@ async function main() {
       name: 'Alok Kumar Verma',
       businessName: 'National Flex Printers & Advertising',
       phone: '+91 99341 55421',
-      address: 'Court Station Road, Purnea',
+      address: 'Station Road, Begusarai',
       serviceCategory: 'Printing & Banners',
       upiId: 'nationalflex@sbi',
       totalBilled: 14500,
@@ -575,7 +737,7 @@ async function main() {
       name: 'Pramod Kumar Saha',
       businessName: 'Champion Sports & Trophies World',
       phone: '+91 94308 77219',
-      address: 'Bhatta Bazar, Purnea',
+      address: 'Traffic Chowk, Begusarai',
       serviceCategory: 'Sports & Trophies',
       upiId: 'championsports@upi',
       totalBilled: 21000,
@@ -865,7 +1027,7 @@ async function main() {
       categoryId: createdIncCats['Individual Public Donations'].id,
       donorName: 'Dr. S. K. Choudhary (Civil Surgeon Retd.)',
       donorPhone: '+91 94318 77610',
-      donorAddressOrVillage: 'Purnea / Parora',
+      donorAddressOrVillage: 'Parora, Begusarai',
       amount: 15000,
       donationDate: new Date('2026-10-29'),
       paymentMethod: 'UPI',
@@ -886,7 +1048,7 @@ async function main() {
     {
       festivalYearId: year2026.id,
       name: 'Parora Modern Agro Industries',
-      brandName: 'Purnea Shuddh Mustard Oil & Atta',
+      brandName: 'Begusarai Agro Foods',
       sponsorTier: 'PLATINUM',
       contributionAmount: 51000,
       isAmountPublic: true,
@@ -1246,13 +1408,114 @@ async function main() {
     await prisma.volunteer.create({ data: v });
   }
 
-  // 20. Audit Log
+  // 20. CMS Banners & Content Sections (Super Admin CMS)
+  await prisma.cmsBanner.deleteMany();
+  await prisma.cmsContentSection.deleteMany();
+
+  const cmsBanners = [
+    {
+      title: 'श्री श्री 108 काली पूजा महोत्सव 2026',
+      subtitle: 'परोरा, बेगूसराय (बिहार - 851217) – 9 एवं 10 नवंबर 2026 को भव्य भक्ति, दिव्य जागरण व सांस्कृतिक महाकुंभ',
+      page: 'HOMEPAGE',
+      bannerType: 'HERO_SLIDER',
+      imageUrl: 'https://images.unsplash.com/photo-1605647540924-852290f6b0d5?auto=format&fit=crop&w=1600&q=80',
+      badgeText: 'पावन वार्षिक महोत्सव 2026',
+      linkUrl: '/events',
+      buttonText: 'संपूर्ण कार्यक्रम विवरण',
+      sortOrder: 1,
+      isActive: true,
+    },
+    {
+      title: 'अखिल बिहार राज्य स्तरीय कबड्डी महासंग्राम',
+      subtitle: 'मुख्य संरक्षक व मार्गदर्शक: श्री अमरनाथ प्रसाद (6203510983) | अत्याधुनिक मैट व डे-नाईट फ्लडलाइट्स कोर्ट',
+      page: 'HOMEPAGE',
+      bannerType: 'HERO_SLIDER',
+      imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1600&q=80',
+      badgeText: 'कबड्डी - परोरा महोत्सव की धड़कन',
+      linkUrl: '/kabaddi',
+      buttonText: 'कबड्डी एरिना व खिलाड़ी प्रोफाइल देखें',
+      sortOrder: 2,
+      isActive: true,
+    },
+    {
+      title: 'वार्षिक मेधावी छात्र प्रतिभा सम्मान समारोह',
+      subtitle: '10वीं, 12वीं, स्नातक, एवं सरकारी प्रतियोगी परीक्षाओं में चयनित ग्रामवासियों को विशेष पदक व छात्रवृत्ति',
+      page: 'HOMEPAGE',
+      bannerType: 'HERO_SLIDER',
+      imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80',
+      badgeText: 'शिक्षा एवं प्रतिभा संवर्धन',
+      linkUrl: '/achievers',
+      buttonText: 'ऑनलाइन नामांकन फॉर्म',
+      sortOrder: 3,
+      isActive: true,
+    },
+  ];
+
+  for (const b of cmsBanners) {
+    await prisma.cmsBanner.create({ data: b });
+  }
+
+  const cmsSections = [
+    {
+      sectionKey: 'COACH_MESSAGE',
+      title: 'बिहार कबड्डी गुरु श्री अमरनाथ प्रसाद का प्रेरणा संदेश',
+      subtitle: 'सुपर एडमिन व मुख्य खेल संरक्षक | पूर्व कबड्डी खिलाड़ी, बिहार राज्य पूर्व बॉक्सर, कराटे ब्लैक बेल्ट (मो: 6203510983)',
+      content: 'परोरा की पावन माटी ने बिहार कबड्डी को निरंतर शीर्ष खिलाड़ी दिए हैं। माँ काली के आशीर्वाद से आयोजित होने वाला यह कबड्डी महाकुंभ हमारे युवाओं में अनुशासन, अदम्य साहस और राष्ट्रीय पहचान का प्रतीक है। खेल को पूरी निष्पक्षता और खेल भावना से खेलें।',
+      mediaUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=600&q=80',
+      isPublished: true,
+    },
+    {
+      sectionKey: 'PRESIDENT_DESK',
+      title: 'अध्यक्षीय उद्बोधन – श्री सिल्लू कुमार',
+      subtitle: 'वर्तमान अध्यक्ष, श्री श्री 108 काली पूजा समिति परोरा',
+      content: 'काली पूजा समिति परोरा के इस वार्षिक महामहोत्सव में समस्त श्रद्धालुओं, खेल प्रेमियों और आगंतुकों का सादर अभिनंदन। पारदर्शी प्रबंधन, भव्य सांस्कृतिक आयोजन और ग्रामीण प्रतिभाओं का संवर्धन हमारा सर्वोच्च ध्येय है।',
+      isPublished: true,
+    },
+    {
+      sectionKey: 'KABADDI_SPOTLIGHT',
+      title: 'कबड्डी - परोरा महोत्सव की धड़कन व गौरवमयी इतिहास',
+      subtitle: 'पूरे बिहार में प्रसिद्ध परोरा कबड्डी टीम और उसका ऐतिहासिक स्वर्णिम सफर',
+      content: 'काली पूजा महोत्सव के साथ-साथ कबड्डी इस पूरे आयोजन का प्राण है। परोरा टीम पूरे बिहार में अपने आक्रामक खेल और अनुशासन के लिए विख्यात है। कोच अमरनाथ प्रसाद जी के सानिध्य में तैयार युवा खिलाड़ी आज राज्य का नाम रोशन कर रहे हैं।',
+      isPublished: true,
+    },
+  ];
+
+  for (const s of cmsSections) {
+    await prisma.cmsContentSection.create({ data: s });
+  }
+
+  // 21. Committee updates for Amarnath Prasad & Sillu Kumar
+  await prisma.committeeMember.updateMany({
+    where: { sortOrder: 1 },
+    data: {
+      name: 'Amarnath Prasad',
+      nameHindi: 'श्री अमरनाथ प्रसाद',
+      designation: 'Patron & Chief Sports Mentor (Super Admin)',
+      designationHindi: 'मुख्य संरक्षक व खेल मार्गदर्शक (सुपर एडमिन)',
+      phone: '6203510983',
+      message: 'बिहार कबड्डी के गौरवशाली इतिहास को आगे बढ़ाना और ग्रामीण प्रतिभाओं को राष्ट्रीय मंच दिलाना ही हमारा ध्येय है।',
+    },
+  });
+
+  await prisma.committeeMember.updateMany({
+    where: { sortOrder: 2 },
+    data: {
+      name: 'Sillu Kumar',
+      nameHindi: 'श्री सिल्लू कुमार',
+      designation: 'President',
+      designationHindi: 'अध्यक्ष',
+      phone: '+91 98350 21478',
+      message: 'समिति के प्रत्येक आयोजन में शुचिता, सेवा और जन-सहयोग की भावना ही परोरा का गौरव है।',
+    },
+  });
+
+  // 22. Audit Log
   await prisma.auditLog.create({
     data: {
-      userName: 'Dr. Rameshwar Prasad Singh',
+      userName: 'Amarnath Prasad (Super Admin)',
       action: 'SYSTEM_INITIALIZATION',
       module: 'SYSTEM',
-      details: 'Kali Puja Samiti Parora complete database seeded with 2026, 2025, and 2024 records.',
+      details: 'Kali Puja Samiti Parora complete database seeded with 2026, 2025, and 2024 records, Coach Amarnath Prasad, President Sillu Kumar, CMS banners, and player profiles.',
     },
   });
 

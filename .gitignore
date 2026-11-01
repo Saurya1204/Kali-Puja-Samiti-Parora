@@ -10,4 +10,9 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 *.pem
+*.tsbuildinfo
+prisma/dev.db
+*.db
+*.db-journal
+prisma/client/
 

@@ -16,7 +16,7 @@ export default function WhatsAppShareButton({
 }: WhatsAppShareProps) {
   const handleShare = () => {
     const pageUrl = url || (typeof window !== 'undefined' ? window.location.href : 'https://kalipujaparora.org');
-    const defaultText = `🙏 जय माँ काली! \n\nश्री श्री 108 काली पूजा समिति परोरा (पूर्णिया) के वार्षिक महोत्सव (9-10 नवंबर 2026) में आप सादर आमंत्रित हैं।\n\nकबड्डी टूर्नामेंट, सांस्कृतिक संध्या, एवं मेधावी छात्र सम्मान के संपूर्ण विवरण एवं ऑनलाइन पंजीकरण हेतु लिंक देखें:\n${pageUrl}`;
+    const defaultText = `🙏 जय माँ काली! \n\nश्री श्री 108 काली पूजा समिति परोरा (बेगूसराय, पिन: 851217) के वार्षिक महोत्सव (9-10 नवंबर 2026) में आप सादर आमंत्रित हैं।\n\nकबड्डी टूर्नामेंट, सांस्कृतिक संध्या, एवं मेधावी छात्र सम्मान के संपूर्ण विवरण एवं ऑनलाइन पंजीकरण हेतु लिंक देखें:\n${pageUrl}`;
 
     const textToShare = customText || defaultText;
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(textToShare)}`;

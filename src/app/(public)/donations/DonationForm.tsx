@@ -76,7 +76,7 @@ export default function DonationForm() {
               <h2 className="text-xl sm:text-2xl font-extrabold text-amber-200 font-serif">
                 श्री श्री 108 काली पूजा समिति, परोरा
               </h2>
-              <span className="text-[10px] text-stone-400">Reg No: BR-PUR-2012/KP-042 | Purnea, Bihar</span>
+              <span className="text-[10px] text-stone-400">Reg No: BR-BEG-2012/KP-042 | Begusarai, Bihar - 851217</span>
             </div>
             <div className="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 font-serif text-xs font-bold text-center leading-none">
               ॐ माँ काली
@@ -249,7 +249,7 @@ export default function DonationForm() {
             </label>
             <input
               type="text"
-              placeholder="उदा. परोरा / पूर्णिया / पटना"
+              placeholder="उदा. परोरा / बेगूसराय / पटना"
               value={formData.donorAddressOrVillage}
               onChange={(e) => setFormData({ ...formData, donorAddressOrVillage: e.target.value })}
               className="w-full bg-black/50 border border-amber-700/50 rounded-xl px-4 py-2.5 text-stone-100 focus:outline-none focus:border-amber-400"

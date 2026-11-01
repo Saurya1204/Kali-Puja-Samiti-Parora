@@ -50,7 +50,7 @@ export default async function DonationsPage() {
   const bankName = settings['BANK_NAME'] || 'State Bank of India';
   const accountNo = settings['BANK_ACCOUNT_NO'] || '38920194829';
   const ifsc = settings['BANK_IFSC'] || 'SBIN0001234';
-  const branch = settings['BANK_BRANCH'] || 'Kasba Branch, Purnea';
+  const branch = settings['BANK_BRANCH'] || 'Main Branch, Begusarai (851217)';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">

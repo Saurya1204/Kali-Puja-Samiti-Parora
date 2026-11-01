@@ -27,6 +27,7 @@ export default async function AdminKabaddiPage({
 
   const teams = await prisma.kabaddiTeam.findMany({
     where: { festivalYearId: festivalYear?.id },
+    include: { players: true },
     orderBy: [{ points: 'desc' }, { matchesWon: 'desc' }],
   });
 

@@ -463,7 +463,7 @@ export default function DonationManager({
                 <h3 className="text-xl font-extrabold text-amber-200 font-serif">
                   श्री श्री 108 काली पूजा समिति, परोरा
                 </h3>
-                <span className="text-[10px] text-stone-400">Reg No: BR-PUR-2012/KP-042 | Purnea (Bihar)</span>
+                <span className="text-[10px] text-stone-400">Reg No: BR-BEG-2012/KP-042 | Begusarai (Bihar - 851217)</span>
               </div>
 
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 flex justify-between items-center text-xs">

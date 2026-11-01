@@ -77,7 +77,7 @@ export default function VendorManager({
       businessName: '',
       phone: '',
       altPhone: '',
-      address: 'Purnea, Bihar',
+      address: 'Begusarai, Bihar - 851217',
       serviceCategory: 'Tent, Stage & Pandal',
       upiId: '',
       bankAccountNumber: '',
@@ -365,7 +365,7 @@ export default function VendorManager({
                 <label className="font-semibold text-amber-200">पता (Address)</label>
                 <input
                   type="text"
-                  placeholder="उदा. मेन रोड कस्बा, पूर्णिया"
+                  placeholder="उदा. मेन रोड, बेगूसराय"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full bg-black/50 border border-amber-700/50 rounded-xl px-3 py-2 text-stone-100 focus:outline-none"

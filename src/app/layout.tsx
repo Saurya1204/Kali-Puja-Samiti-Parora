@@ -5,11 +5,12 @@ import { LanguageProvider } from '@/lib/languageContext';
 export const metadata: Metadata = {
   title: 'Kali Puja Samiti Parora | Official Festival Website & Portal',
   description:
-    'Official website and management portal of Kali Puja Samiti Parora (Purnea, Bihar). Annual Kali Puja Utsav, All-Bihar Kabaddi Tournament, Cultural Programs, and Student Achievers Felicitation.',
+    'Official website and management portal of Kali Puja Samiti Parora (Begusarai, Bihar - 851217). Annual Kali Puja Utsav, All-Bihar Kabaddi Tournament, Cultural Programs, and Student Achievers Felicitation.',
   keywords: [
     'Kali Puja Parora',
     'Kali Puja Samiti Parora',
-    'Parora Purnea',
+    'Parora Begusarai',
+    'Parora 851217',
     'Kabaddi Tournament Parora',
     'Parora Pratibha Samman',
     'Kali Puja 2026',

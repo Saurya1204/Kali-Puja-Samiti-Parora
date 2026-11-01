@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from '@/components/public/Navbar';
 import Footer from '@/components/public/Footer';
 import MarqueeAnnouncement from '@/components/public/MarqueeAnnouncement';
+import MobileBottomBar from '@/components/public/MobileBottomBar';
 import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -28,11 +29,12 @@ export default async function PublicLayout({
     <div className="flex flex-col min-h-screen">
       <MarqueeAnnouncement announcementText={marqueeText} />
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 pb-16 lg:pb-0">
         {children}
       </main>
       <Footer />
+      {/* Mobile-first bottom action bar for instantaneous 1-tap navigation */}
+      <MobileBottomBar />
     </div>
   );
 }
-
