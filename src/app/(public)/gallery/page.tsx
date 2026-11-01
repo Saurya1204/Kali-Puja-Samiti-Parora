@@ -10,28 +10,34 @@ export default async function GalleryPage({
 }: {
   searchParams?: { year?: string; category?: string };
 }) {
-  const years = await prisma.festivalYear.findMany({
-    orderBy: { year: 'desc' },
-  });
-
-  const selectedYearInt = searchParams?.year ? parseInt(searchParams.year) : (years[0]?.year || 2026);
+  let years: any[] = [];
+  let galleries: any[] = [];
+  const selectedYearInt = searchParams?.year ? parseInt(searchParams.year) : 2026;
   const selectedCategory = searchParams?.category;
 
-  const targetYear = years.find((y) => y.year === selectedYearInt) || years[0];
+  try {
+    years = await prisma.festivalYear.findMany({
+      orderBy: { year: 'desc' },
+    });
 
-  const galleries = await prisma.gallery.findMany({
-    where: {
-      ...(targetYear ? { festivalYearId: targetYear.id } : {}),
-      ...(selectedCategory ? { category: selectedCategory } : {}),
-    },
-    include: {
-      media: {
-        orderBy: { sortOrder: 'asc' },
+    const targetYear = years.find((y) => y.year === selectedYearInt) || years[0];
+
+    galleries = await prisma.gallery.findMany({
+      where: {
+        ...(targetYear ? { festivalYearId: targetYear.id } : {}),
+        ...(selectedCategory ? { category: selectedCategory } : {}),
       },
-      festivalYear: true,
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+      include: {
+        media: {
+          orderBy: { sortOrder: 'asc' },
+        },
+        festivalYear: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  } catch (err) {
+    console.error('Error loading gallery:', err);
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">

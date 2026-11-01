@@ -23,27 +23,34 @@ export default async function EventsPage({
   searchParams?: { category?: string };
 }) {
   const selectedCategory = searchParams?.category;
+  let categories: any[] = [];
+  let events: any[] = [];
+  let activeYear: any = null;
 
-  const categories = await prisma.eventCategory.findMany({
-    orderBy: { sortOrder: 'asc' },
-  });
+  try {
+    categories = await prisma.eventCategory.findMany({
+      orderBy: { sortOrder: 'asc' },
+    });
 
-  const activeYear = await prisma.festivalYear.findFirst({
-    where: { isActive: true },
-  });
+    activeYear = await prisma.festivalYear.findFirst({
+      where: { isActive: true },
+    });
 
-  const events = await prisma.event.findMany({
-    where: {
-      isPublished: true,
-      ...(activeYear ? { festivalYearId: activeYear.id } : {}),
-      ...(selectedCategory ? { category: { slug: selectedCategory } } : {}),
-    },
-    include: {
-      category: true,
-      festivalYear: true,
-    },
-    orderBy: { date: 'asc' },
-  });
+    events = await prisma.event.findMany({
+      where: {
+        isPublished: true,
+        ...(activeYear ? { festivalYearId: activeYear.id } : {}),
+        ...(selectedCategory ? { category: { slug: selectedCategory } } : {}),
+      },
+      include: {
+        category: true,
+        festivalYear: true,
+      },
+      orderBy: { date: 'asc' },
+    });
+  } catch (err) {
+    console.error('Error loading events:', err);
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">

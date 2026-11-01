@@ -31,72 +31,107 @@ import {
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  // Fetch active festival year or fallback to 2026
-  let festivalYear = await prisma.festivalYear.findFirst({
-    where: { isActive: true },
-    include: {
-      events: {
-        where: { isPublished: true },
-        include: { category: true },
-        orderBy: { date: 'asc' },
-        take: 6,
-      },
-      kabaddiMatches: {
-        where: { status: 'LIVE' },
-        include: { teamA: true, teamB: true },
-        take: 1,
-      },
-      studentAchievements: {
-        where: { isPublished: true, status: 'APPROVED' },
-        orderBy: { yearOfPassing: 'desc' },
-        take: 4,
-      },
-      sponsors: {
-        where: { isPublished: true },
-        orderBy: { sortOrder: 'asc' },
-      },
-      donations: {
-        where: { isPubliclyVisible: true, status: 'CONFIRMED' },
-        orderBy: { amount: 'desc' },
-        take: 5,
-      },
-      galleries: {
-        include: { media: { take: 1 } },
-        take: 4,
-      },
-      announcements: {
-        where: { isActive: true },
-        orderBy: { isPinned: 'desc' },
-        take: 3,
-      },
-    },
-  });
+  let festivalYear: any = null;
+  let cmsBanners: any[] = [];
+  let cmsSections: any[] = [];
 
-  if (!festivalYear) {
+  try {
     festivalYear = await prisma.festivalYear.findFirst({
-      orderBy: { year: 'desc' },
+      where: { isActive: true },
       include: {
-        events: { include: { category: true }, take: 6 },
-        kabaddiMatches: { include: { teamA: true, teamB: true }, take: 1 },
-        studentAchievements: { take: 4 },
-        sponsors: true,
-        donations: { take: 5 },
-        galleries: { include: { media: true }, take: 4 },
-        announcements: { take: 3 },
+        events: {
+          where: { isPublished: true },
+          include: { category: true },
+          orderBy: { date: 'asc' },
+          take: 6,
+        },
+        kabaddiMatches: {
+          where: { status: 'LIVE' },
+          include: { teamA: true, teamB: true },
+          take: 1,
+        },
+        studentAchievements: {
+          where: { isPublished: true, status: 'APPROVED' },
+          orderBy: { yearOfPassing: 'desc' },
+          take: 4,
+        },
+        sponsors: {
+          where: { isPublished: true },
+          orderBy: { sortOrder: 'asc' },
+        },
+        donations: {
+          where: { isPubliclyVisible: true, status: 'CONFIRMED' },
+          orderBy: { amount: 'desc' },
+          take: 5,
+        },
+        galleries: {
+          include: { media: { take: 1 } },
+          take: 4,
+        },
+        announcements: {
+          where: { isActive: true },
+          orderBy: { isPinned: 'desc' },
+          take: 3,
+        },
       },
     });
+
+    if (!festivalYear) {
+      festivalYear = await prisma.festivalYear.findFirst({
+        orderBy: { year: 'desc' },
+        include: {
+          events: { include: { category: true }, take: 6 },
+          kabaddiMatches: { include: { teamA: true, teamB: true }, take: 1 },
+          studentAchievements: { take: 4 },
+          sponsors: true,
+          donations: { take: 5 },
+          galleries: { include: { media: true }, take: 4 },
+          announcements: { take: 3 },
+        },
+      });
+    }
+
+    // Fetch CMS Banners and Dynamic Content Sections
+    const [fetchedBanners, fetchedSections] = await Promise.all([
+      prisma.cmsBanner.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: 'asc' },
+      }),
+      prisma.cmsContentSection.findMany({
+        where: { isPublished: true },
+      }),
+    ]);
+    cmsBanners = fetchedBanners;
+    cmsSections = fetchedSections;
+  } catch (dbError) {
+    console.error('Database connection or query error on HomePage:', dbError);
   }
 
-  // Fetch CMS Banners and Dynamic Content Sections
-  const [cmsBanners, cmsSections] = await Promise.all([
-    prisma.cmsBanner.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: 'asc' },
-    }),
-    prisma.cmsContentSection.findMany({
-      where: { isPublished: true },
-    }),
-  ]);
+  // Graceful fallback banners if CMS banners are empty or DB is initializing
+  if (cmsBanners.length === 0) {
+    cmsBanners = [
+      {
+        id: 'fallback-kali-darshan',
+        title: 'श्री श्री 108 माँ काली दिव्य दर्शन – परोरा',
+        subtitle: 'परौरा, बेगूसराय (बिहार - 851217) – पावन वार्षिक काली पूजा महोत्सव 2026',
+        badgeText: '🔴 दिव्य पावन दर्शन',
+        imageUrl: 'https://images.unsplash.com/photo-1605647540924-852290f6b0d5?auto=format&fit=crop&w=1600&q=80',
+        buttonText: 'कार्यक्रम विवरण',
+        linkUrl: '/events',
+        sortOrder: 1,
+      },
+      {
+        id: 'fallback-kabaddi',
+        title: 'अखिल बिहार राज्य स्तरीय कबड्डी महासंग्राम',
+        subtitle: 'मुख्य संरक्षक व मार्गदर्शक: श्री अमरनाथ प्रसाद (6203510983) | अत्याधुनिक मैट व डे-नाईट फ्लडलाइट्स कोर्ट',
+        badgeText: 'कबड्डी - परोरा महोत्सव की धड़कन',
+        imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1600&q=80',
+        buttonText: 'कबड्डी एरिना देखें',
+        linkUrl: '/kabaddi',
+        sortOrder: 2,
+      },
+    ];
+  }
 
   const sectionMap = new Map(cmsSections.map((s) => [s.sectionKey, s]));
   const coachMessage = sectionMap.get('COACH_MESSAGE');
@@ -418,7 +453,7 @@ export default async function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {festivalYear?.events?.map((event) => (
+          {festivalYear?.events?.map((event: any) => (
             <div key={event.id} className="festive-card p-6 flex flex-col justify-between group">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -503,7 +538,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {festivalYear?.studentAchievements?.map((student) => (
+            {festivalYear?.studentAchievements?.map((student: any) => (
               <div
                 key={student.id}
                 className="bg-black/50 border border-amber-500/30 rounded-2xl p-5 hover:border-amber-400 transition-all flex flex-col justify-between"
@@ -571,7 +606,7 @@ export default async function HomePage() {
 
         {/* Sponsor Tier Showcase */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          {festivalYear?.sponsors?.map((sp) => (
+          {festivalYear?.sponsors?.map((sp: any) => (
             <div
               key={sp.id}
               className="bg-gradient-to-b from-maroon-950/80 to-black/70 border border-amber-500/40 rounded-2xl p-6 text-center space-y-3 relative overflow-hidden group hover:border-amber-400 transition-all shadow-md"
@@ -601,7 +636,7 @@ export default async function HomePage() {
             <span>शुभकामनाएं एवं सहयोग राशि (Devotee Offerings)</span>
           </h4>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            {festivalYear?.donations?.map((don) => (
+            {festivalYear?.donations?.map((don: any) => (
               <div
                 key={don.id}
                 className="bg-black/60 border border-amber-500/20 rounded-full px-4 py-2 flex items-center gap-3 text-xs"

@@ -13,19 +13,24 @@ export default async function AchieversPage({
   searchParams?: { category?: string };
 }) {
   const selectedCategory = searchParams?.category;
+  let achievers: any[] = [];
 
-  const activeYear = await prisma.festivalYear.findFirst({
-    where: { isActive: true },
-  });
+  try {
+    const activeYear = await prisma.festivalYear.findFirst({
+      where: { isActive: true },
+    });
 
-  const achievers = await prisma.studentAchievement.findMany({
-    where: {
-      isPublished: true,
-      status: 'APPROVED',
-      ...(selectedCategory ? { category: selectedCategory } : {}),
-    },
-    orderBy: [{ yearOfPassing: 'desc' }, { createdAt: 'desc' }],
-  });
+    achievers = await prisma.studentAchievement.findMany({
+      where: {
+        isPublished: true,
+        status: 'APPROVED',
+        ...(selectedCategory ? { category: selectedCategory } : {}),
+      },
+      orderBy: [{ yearOfPassing: 'desc' }, { createdAt: 'desc' }],
+    });
+  } catch (err) {
+    console.error('Error loading achievers:', err);
+  }
 
   const categories = [
     { key: 'CLASS_10', label: '10वीं बोर्ड (Matric)' },

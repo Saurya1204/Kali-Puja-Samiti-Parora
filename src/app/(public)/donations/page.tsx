@@ -17,33 +17,41 @@ import {
 export const dynamic = 'force-dynamic';
 
 export default async function DonationsPage() {
-  const activeYear = await prisma.festivalYear.findFirst({
-    where: { isActive: true },
-  });
-
-  const sponsors = await prisma.sponsor.findMany({
-    where: {
-      isPublished: true,
-      ...(activeYear ? { festivalYearId: activeYear.id } : {}),
-    },
-    orderBy: { sortOrder: 'asc' },
-  });
-
-  const publicDonors = await prisma.donation.findMany({
-    where: {
-      isPubliclyVisible: true,
-      status: 'CONFIRMED',
-      ...(activeYear ? { festivalYearId: activeYear.id } : {}),
-    },
-    orderBy: [{ amount: 'desc' }, { donationDate: 'desc' }],
-    take: 20,
-  });
-
-  const settingsRecords = await prisma.websiteSetting.findMany();
+  let activeYear: any = null;
+  let sponsors: any[] = [];
+  let publicDonors: any[] = [];
   const settings: Record<string, string> = {};
-  settingsRecords.forEach((s) => {
-    settings[s.key] = s.value;
-  });
+
+  try {
+    activeYear = await prisma.festivalYear.findFirst({
+      where: { isActive: true },
+    });
+
+    sponsors = await prisma.sponsor.findMany({
+      where: {
+        isPublished: true,
+        ...(activeYear ? { festivalYearId: activeYear.id } : {}),
+      },
+      orderBy: { sortOrder: 'asc' },
+    });
+
+    publicDonors = await prisma.donation.findMany({
+      where: {
+        isPubliclyVisible: true,
+        status: 'CONFIRMED',
+        ...(activeYear ? { festivalYearId: activeYear.id } : {}),
+      },
+      orderBy: [{ amount: 'desc' }, { donationDate: 'desc' }],
+      take: 20,
+    });
+
+    const settingsRecords = await prisma.websiteSetting.findMany();
+    settingsRecords.forEach((s) => {
+      settings[s.key] = s.value;
+    });
+  } catch (err) {
+    console.error('Error loading donations data:', err);
+  }
 
   const upiId = settings['UPI_ID'] || 'samitiparora@sbi';
   const upiName = settings['UPI_NAME'] || 'Kali Puja Samiti Parora';
