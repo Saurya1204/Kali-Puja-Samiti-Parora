@@ -74,12 +74,35 @@ export default function LoginPage() {
         {/* Login Box */}
         <div className="lg:col-span-7 festive-card p-6 sm:p-8 space-y-6">
           <div className="flex items-center gap-3 border-b border-amber-900/40 pb-4">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
               <Lock className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-bold text-stone-100 text-lg">प्रशासनिक लॉगिन (Sign In)</h3>
               <span className="text-xs text-stone-400">अपनी आधिकारिक आईडी एवं पासवर्ड दर्ज करें</span>
+            </div>
+          </div>
+
+          {/* Mobile Quick Tap Selector Chips */}
+          <div className="space-y-2 lg:hidden">
+            <span className="text-[11px] font-bold text-amber-300 block">
+              ⚡ 1-टैप त्वरित रोल चयन (Quick Mobile Fill):
+            </span>
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none no-scrollbar touch-pan-x">
+              {demoAccounts.map((acc) => (
+                <button
+                  key={acc.email}
+                  type="button"
+                  onClick={() => setDemo(acc.email, acc.pass)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border shrink-0 transition-all active:scale-95 ${
+                    email === acc.email
+                      ? 'bg-amber-500 text-maroon-950 border-amber-400 shadow-md font-black'
+                      : 'bg-black/60 text-stone-300 border-amber-900/60 hover:text-white'
+                  }`}
+                >
+                  {acc.role.split(' ')[0]}
+                </button>
+              ))}
             </div>
           </div>
 

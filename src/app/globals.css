@@ -15,9 +15,27 @@
     --gold: 43 96% 56%;
   }
 
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     @apply bg-[#0d0303] text-stone-100 antialiased selection:bg-amber-500 selection:text-maroon-950;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+
+  button, a, input, select, textarea {
+    touch-action: manipulation;
+  }
+
+  /* Prevent automatic iOS Safari zoom-in on focus by ensuring at least 16px on mobile */
+  @media (max-width: 640px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
   }
 }
 
